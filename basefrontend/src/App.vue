@@ -9,7 +9,7 @@
             </div>
             <ul class="menu list-unstyled">
                 <li class="sidebar-item active">
-                    <router-link to="/" class="sidebar-link">
+                    <router-link to="/UploadFile" class="sidebar-link">
                         <i class="bi bi-grid-fill"></i>
                         Upload File
                     </router-link>

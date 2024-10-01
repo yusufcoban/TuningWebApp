@@ -5,8 +5,8 @@ import Donate from './components/Donate.vue'; // New component for Donate page
 
 const routes = [
     {
-        path: '/',
-        name: 'Dashboard',
+        path: '/UploadFile',
+        name: 'UploadFile',
         component: AutoDatabase, // Render AutoDatabase on the Dashboard
     },
     {
