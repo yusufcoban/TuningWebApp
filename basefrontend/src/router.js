@@ -10,8 +10,8 @@ const routes = [
         component: AutoDatabase, // Render AutoDatabase on the Dashboard
     },
     {
-        path: '/donate',
-        name: 'Donate',
+        path: '/myfiles',
+        name: 'MyFiles',
         component: { template: '<div><h1>Donate Page</h1><p>Your donation helps us to...</p></div>' } // Placeholder for Donate page
     },
 ];

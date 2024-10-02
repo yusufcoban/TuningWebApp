@@ -15,7 +15,7 @@
                     </router-link>
                 </li>
                 <li class="sidebar-item">
-                    <router-link to="/donate" class="sidebar-link">
+                    <router-link to="/myfiles" class="sidebar-link">
                         <i class="bi bi-cash"></i>
                         My Files
                     </router-link>
