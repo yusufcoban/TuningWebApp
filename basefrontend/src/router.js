@@ -1,8 +1,11 @@
 // src/router/index.js
 import { createRouter, createWebHistory } from 'vue-router';
 import Login from '@/components/Login.vue'; // Login component
+import Home from '@/components/Home.vue'; // Home component
 import { useStore } from 'vuex'; // Vuex store
 import App from './App.vue'; // Main layout
+import MyFiles from '@/components/MyFiles.vue'; // Main layout
+
 import AutoDatabase from './components/AutoDatabase.vue'; // Dashboard component
 
 // Define your routes
@@ -20,7 +23,7 @@ const routes = [
     {
         path: '/myfiles',
         meta: { requiresAuth: true }, // This route requires authentication
-        component: { template: '<div><h1>Donate Page</h1><p>Your donation helps us to...</p></div>' }
+        component: MyFiles
     },
     {
         path: '/',
@@ -29,7 +32,7 @@ const routes = [
     {
         path: '/home',
         meta: { requiresAuth: true }, // Ensure this route requires authentication,
-        component: { template: '<div><h1>Donate Page</h1><p>Your donation helps us to...</p></div>' }
+        component: Home
     }
 ];
 

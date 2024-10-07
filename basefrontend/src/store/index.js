@@ -1,19 +1,21 @@
-// src/store/index.js
 import { createStore } from 'vuex';
 
 const store = createStore({
     state() {
         return {
             user: JSON.parse(localStorage.getItem('user')) || null, // Initialize user from local storage
+            isAdmin: false, // Add an isAdmin state
         };
     },
     mutations: {
         login(state, user) {
             state.user = { name: user.name, role: user.role }; // Set user data upon successful login
-            localStorage.setItem('user', JSON.stringify(user)); // Store user data in local storage
+            state.isAdmin = user.role === 'Admin'; // Set isAdmin based on role
+            localStorage.setItem('user', JSON.stringify(state.user)); // Store user data in local storage
         },
         logout(state) {
             state.user = null; // Clear user data on logout
+            state.isAdmin = false; // Reset isAdmin
             localStorage.removeItem('user'); // Remove user data from local storage
         },
     },
@@ -28,7 +30,7 @@ const store = createStore({
 
             if (response.ok) {
                 const userData = await response.json();
-                commit('setUser', userData); // Commit the user data
+                commit('login', { name: userCredentials.username, role: userData.role }); // Commit the user data
                 return userData;
             } else {
                 throw new Error('Login failed');
@@ -43,7 +45,10 @@ const store = createStore({
             return state.user !== null; // Check for authentication
         },
         role(state) {
-            return state.user; // Return the user's role
+            return state.user ? state.user.role : null; // Return the user's role
+        },
+        isAdmin(state) {
+            return state.isAdmin; // Return the isAdmin state
         },
     },
 });

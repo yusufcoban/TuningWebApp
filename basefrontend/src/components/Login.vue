@@ -1,4 +1,3 @@
-<!-- src/views/Login.vue -->
 <template>
     <div class="login-container">
         <div class="login-box">
@@ -28,7 +27,7 @@
 </template>
 
 <script>
-    import { mapMutations, mapGetters } from 'vuex'; // Import mapGetters to access Vuex state
+    import { mapMutations, mapGetters } from 'vuex';
     export default {
         data() {
             return {
@@ -60,15 +59,15 @@
                             username: this.username,
                             password: this.password,
                         }),
-                        credentials: 'include',
+                        credentials: 'include', // Include cookies in the request
                     });
 
                     if (!response.ok) {
                         const data = await response.json();
                         this.errorMessage = data.message || 'Login failed';
                     } else {
-                        const data = await response.json();
-                        this.login({name:this.username,role:data.role}); // Commit the role to the store
+                        const userData = await response.json();
+                        this.login({ name: this.username, role: userData.role }); // Commit the role to the store
                         this.$router.push('/home'); // Redirect to home or dashboard after login
                     }
                 } catch (error) {
@@ -79,7 +78,6 @@
         },
     };
 </script>
-
 
 <style scoped>
     /* Your existing styles */
@@ -173,3 +171,4 @@
         color: red;
     }
 </style>
+

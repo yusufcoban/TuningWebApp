@@ -5,80 +5,60 @@ using Microsoft.AspNetCore.Mvc;
 
 using System.Security.Claims;
 
-namespace BaseBackend.Controllers
+[ApiController]
+[Route("api")]
+public class AuthController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class LoginController : ControllerBase
+    [HttpPost("login")]
+    [AllowAnonymous]
+    public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        // Simple in-memory user store for demonstration purposes
-        private static readonly Dictionary<string, (string password, string role)> Users = new()
+        // Validate user credentials (this is just an example)
+        if (request.Username == "admin" && request.Password == "admin") // Use a proper user validation method
         {
-            { "admin", ("admin", "Admin") },
-            { "user", ("user", "User") }
-        };
-
-        // POST: api/Login
-        [HttpPost]
-        [AllowAnonymous]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
-        {
-            // Check if the username exists and the password matches
-            if (Users.ContainsKey(request.Username) && Users[request.Username].password == request.Password)
+            var claims = new List<Claim>
             {
-                var userRole = Users[request.Username].role;
+                new Claim(ClaimTypes.Name, request.Username),
+                new Claim(ClaimTypes.Role, "Admin"), // Set user role if needed
+            };
 
-                // Create user claims
-                var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, request.Username),
-                    new Claim(ClaimTypes.Role, userRole)
-                };
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
 
-                // Create identity and principal
-                var identity = new ClaimsIdentity(claims, "CookieAuth");  // Changed to use "CookieAuth"
-                var principal = new ClaimsPrincipal(identity);
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
 
-                // Sign in the user using the correct scheme
-                await HttpContext.SignInAsync("CookieAuth", principal);  // Changed to use "CookieAuth"
-
-                // Return a JSON response with the role
-                return Ok(new { Message = "Login successful", Role = userRole });
-            }
-
-            // Invalid credentials, return 401 Unauthorized
-            return Unauthorized(new { Message = "Invalid username or password" });
+            return Ok(new { message = "Login successful", role = "Admin"});
         }
 
-        // GET: api/Logout
-        [HttpGet("logout")]
-        public async Task<IActionResult> Logout()
+        if (request.Username == "user" && request.Password == "user") // Use a proper user validation method
         {
-            // Sign out the user using the correct scheme
-            await HttpContext.SignOutAsync("CookieAuth");  // Changed to use "CookieAuth"
-            return Ok(new { Message = "Logout successful" });
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, request.Username),
+                new Claim(ClaimTypes.Role, "user"), // Set user role if needed
+            };
+
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
+
+            return Ok(new { message = "Login successful" , role = "User" });
         }
 
-        // A sample protected route to test role-based access
-        [HttpGet("admin")]
-        [Authorize(Roles = "Admin")]
-        public IActionResult AdminPage()
-        {
-            return Ok(new { Message = "Welcome, Admin!" });
-        }
-
-        [HttpGet("user")]
-        [Authorize(Roles = "User")]
-        public IActionResult UserPage()
-        {
-            return Ok(new { Message = "Welcome, User!" });
-        }
+        return Unauthorized(new { message = "Invalid username or password" });
     }
 
-    // Model for Login Request
-    public class LoginRequest
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout()
     {
-        public string Username { get; set; }
-        public string Password { get; set; }
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        return Ok(new { message = "Logout successful" });
     }
+}
+
+public class LoginRequest
+{
+    public string Username { get; set; }
+    public string Password { get; set; }
 }
