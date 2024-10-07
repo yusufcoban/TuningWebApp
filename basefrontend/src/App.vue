@@ -58,7 +58,6 @@
                 return this.user !== null; // Check if the user is authenticated
             },
             isAdmin() {
-                debugger;
                 return this.user && this.user.role === 'Admin'; // Adjust this as per your logic for admins
             },
         },

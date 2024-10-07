@@ -68,7 +68,6 @@
                         this.errorMessage = data.message || 'Login failed';
                     } else {
                         const data = await response.json();
-                        alert(`Welcome ${data.role}!`);
                         this.login({name:this.username,role:data.role}); // Commit the role to the store
                         this.$router.push('/home'); // Redirect to home or dashboard after login
                     }
