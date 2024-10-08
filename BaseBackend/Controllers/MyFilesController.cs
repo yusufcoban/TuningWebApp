@@ -20,6 +20,46 @@ namespace BaseBackend.Controllers
             return Ok(uploadedFiles); // Return the list as JSON
         }
 
+        private readonly string _targetFilePath;
+
+        public MyFilesController()
+        {
+            // Set the path where you want to save uploaded files
+            _targetFilePath = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles");
+
+            // Ensure the directory exists
+            if (!Directory.Exists(_targetFilePath))
+            {
+                Directory.CreateDirectory(_targetFilePath);
+            }
+        }
+
+        // POST api/fileupload
+        [HttpPost("upload")]
+        public async Task<IActionResult> UploadFile(IFormFile file, [FromForm] string[] solutions)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("No file uploaded.");
+            }
+
+            // Handle the uploaded file
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles", file.FileName);
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            // Handle the solutions array
+            foreach (var solution in solutions)
+            {
+                Console.WriteLine($"Solution: {solution}");
+            }
+
+            return Ok(new { Message = "File and solutions uploaded successfully." });
+        }
+
+
         private List<UploadedFile> GenerateFakeUploadedFiles(int count)
         {
             var files = new List<UploadedFile>();

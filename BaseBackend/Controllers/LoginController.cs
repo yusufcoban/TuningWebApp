@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using BaseBackend.Models;
+
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -54,6 +56,15 @@ public class AuthController : ControllerBase
     {
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         return Ok(new { message = "Logout successful" });
+    }
+
+    [HttpGet("UserInformation")]
+    [Authorize]
+    public async Task<IActionResult> UserInformation()
+    {
+        var username =  User.Identity.Name; // This gets the username
+        UserInformation currentUser = new UserInformation(username);
+        return Ok(new { currentUser });
     }
 }
 

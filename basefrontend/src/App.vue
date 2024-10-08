@@ -59,7 +59,7 @@
             },
             isAdmin() {
                 return this.user && this.user.role === 'Admin'; // Adjust this as per your logic for admins
-            },
+            }
         },
         methods: {
             handleLogout() {

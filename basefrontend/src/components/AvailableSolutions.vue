@@ -104,30 +104,45 @@
                 this.uploadedFile = event.target.files[0];
             },
             sendTuningData() {
+                // Check if a file is uploaded
                 if (!this.uploadedFile) {
                     alert('Please upload a file.');
                     return;
                 }
 
+                // Create FormData object and append the uploaded file
                 const formData = new FormData();
-                formData.append('file', this.uploadedFile);
+                formData.append('file', this.uploadedFile); // Upload the file
 
+                // Filter selected solutions and append them to FormData
                 const checkedSolutions = this.solutions.filter(solution => solution.checked);
-                checkedSolutions.forEach(solution => {
-                    formData.append('solutions[]', solution.name);
+                checkedSolutions.forEach((solution, index) => {
+                    formData.append(`solutions[${index}]`, solution.name); // Appending each checked solution by index
                 });
 
-                fetch('/api/tuning', {
+                // Get the API URL from environment variables
+                const apiUrl = import.meta.env.VITE_API_BASE_URL;
+
+                // Send POST request to upload the file and solutions
+                fetch(`${apiUrl}/api/MyFiles/upload`, {
                     method: 'POST',
+                    credentials: 'include',
                     body: formData,
-                }).then(response => {
-                    if (!response.ok) {
-                        throw new Error('Failed to upload data');
-                    }
-                    console.log('File uploaded successfully');
-                }).catch(error => {
-                    console.error('Error:', error);
-                });
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to upload data');
+                        }
+                        return response.json(); // assuming the response is JSON
+                    })
+                    .then(data => {
+                        console.log('File and solutions uploaded successfully:', data);
+                        alert('File and solutions uploaded successfully!');
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('There was an error uploading the file and solutions. Please try again.');
+                    });
             },
             cancelUpload() {
                 this.$emit('cancel-upload');
