@@ -36,7 +36,7 @@ namespace BaseBackend.Controllers
 
         // POST api/fileupload
         [HttpPost("upload")]
-        public async Task<IActionResult> UploadFile(IFormFile file, [FromForm] string[] solutions)
+        public async Task<IActionResult> UploadFile(IFormFile file, [FromForm] string[] solutions, [FromForm] string solutionid, [FromForm] string[] dtcList)
         {
             if (file == null || file.Length == 0)
             {

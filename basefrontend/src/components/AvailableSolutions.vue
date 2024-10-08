@@ -86,7 +86,8 @@
     export default {
         props: {
             solutions: Array, // Receives available solutions from the parent
-            ecuInfoSelected: Array // Receives ECU info from the parent
+            ecuInfoSelected: Array, // Receives ECU info from the parent,
+            specialInfos: Array,
         },
         data() {
             return {
@@ -119,6 +120,9 @@
                 checkedSolutions.forEach((solution, index) => {
                     formData.append(`solutions[${index}]`, solution.name); // Appending each checked solution by index
                 });
+
+                // Append solutionId to FormData
+                formData.append('solutionid', this.specialInfos?.tuning_id+'');
 
                 // Get the API URL from environment variables
                 const apiUrl = import.meta.env.VITE_API_BASE_URL;

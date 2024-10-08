@@ -74,6 +74,7 @@
         <AvailableSolutions v-if="selectedModel" :solutions="availableSolutionsWithLogos"
                             :additionalInformation="additionalInformation"
                             :ecuInfoSelected="ecuInfoSelected"
+                            :specialInfos="selectedModel"
                             @toggle-checkbox="toggleCheckbox"
                             @show-more-details="showMoreDetails"
                             @cancel-upload="cancelUpload" />
