@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization; // Add this namespace
+﻿using BaseBackend.Models; // Import your model namespace
+
+using Microsoft.AspNetCore.Authorization; // Add this namespace
 using Microsoft.AspNetCore.Mvc;
-using BaseBackend.Models; // Import your model namespace
-using System.Collections.Generic;
-using System;
 
 namespace BaseBackend.Controllers
 {
@@ -43,9 +42,27 @@ namespace BaseBackend.Controllers
                 return BadRequest("No file uploaded.");
             }
 
+            var username = User.Identity.Name; // This gets the username
+            UserInformation currentUser = new UserInformation(username);
+
             // Handle the uploaded file
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles", file.FileName);
-            using (var stream = new FileStream(filePath, FileMode.Create))
+            // Get the file extension
+            var fileExtension = Path.GetExtension(file.FileName);
+
+            // Get the base file name without the extension
+            var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(file.FileName);
+
+            // Create the timestamp
+            var timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmssfff");
+
+            // Combine the base file name and timestamp
+            var fileName = $"{fileNameWithoutExtension}_{timestamp}{fileExtension}";
+
+            // Create the full file path (including the username as a subfolder under UploadedFiles)
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles", username, fileName);
+
+            // Ensure the directory for the user exists (create it if necessary)
+            Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles", username)); using (var stream = new FileStream(filePath, FileMode.Create))
             {
                 await file.CopyToAsync(stream);
             }

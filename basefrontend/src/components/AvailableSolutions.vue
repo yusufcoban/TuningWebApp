@@ -57,7 +57,7 @@
                                     </div>
                                 </div>
 
-                                <textarea style="width:90%;min-height:5em" placeholder="Enter additional info"></textarea>
+                                <textarea style="width:90%;min-height:5em" placeholder="Enter additional info" v-model="dtcList"></textarea>
                             </div>
                         </div>
                     </div>
@@ -91,7 +91,8 @@
         },
         data() {
             return {
-                uploadedFile: null // Store the uploaded file
+                uploadedFile: null, // Store the uploaded file
+                dtcList:''
             };
         },
         methods: {
@@ -122,7 +123,23 @@
                 });
 
                 // Append solutionId to FormData
-                formData.append('solutionid', this.specialInfos?.tuning_id+'');
+                formData.append('solutionid', this.specialInfos?.tuning_id + '');
+
+                // Assuming this.dtcList is a string like 'code1,code2;code3,code4'
+                // Assuming this.dtcList is a string that may be empty
+                let dtcListS = this.dtcList ? this.dtcList.split(/[,;]+/) : [];
+
+                // If the array is empty, append an empty array to formData
+                if (dtcListS.length === 0) {
+                    formData.append('dtcList[]', ''); // Option 1: Add an empty value
+                    // formData.append('dtcList', []); // Option 2: Add an empty array directly if supported
+                } else {
+                    // Iterate over the array and append each element to formData
+                    dtcListS.forEach((listS, index) => {
+                        formData.append(`dtcList[${index}]`, listS);
+                    });
+                }
+                
 
                 // Get the API URL from environment variables
                 const apiUrl = import.meta.env.VITE_API_BASE_URL;
