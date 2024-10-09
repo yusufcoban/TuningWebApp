@@ -1,4 +1,4 @@
-export const carBrands = [
+xport const carBrands = [
     {
         name: "Abarth",
         icon: "../src/assets/brandlogos/abarth.png",
