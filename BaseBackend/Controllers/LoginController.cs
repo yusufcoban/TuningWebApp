@@ -33,7 +33,7 @@ public class AuthController : ControllerBase
         }
 
         var users = new Dictionary<string, string>
-    {
+    { { "user", "user" },
         { "user1", "user1" },
         { "user2", "user2" },
         { "user3", "user3" },

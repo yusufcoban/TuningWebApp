@@ -1,11 +1,13 @@
 ﻿using BaseBackend.Models;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace YourNamespace.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize] // Ensure only authenticated users can access this controller
     public class TuningController : ControllerBase
     {
         TuningDatabaseHandler tuningDatabaseHandler = new TuningDatabaseHandler();

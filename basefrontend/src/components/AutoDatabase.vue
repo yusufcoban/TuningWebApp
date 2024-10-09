@@ -29,6 +29,9 @@
 
                 <div v-else-if="!isUploading && selectedModel == null">
                     <h5 class="text-gray-800 w-bolder mb-4">Models for {{ selectedMake.name }}</h5>
+                    <div v-if="isLoading" class="loading-indicator">
+                        <p>Loading tuning data...</p> <!-- You can replace this with a spinner or any loading animation -->
+                    </div>
                     <div class="items-grid models">
                         <a v-for="model in selectedMake.models" :href="'#'" @click.prevent="fetchTuningData(model.id)" :key="model.id" class="rounded item hoverable d-flex flex-column align-items-center p-4">
                             <div class="mb-4">
@@ -55,13 +58,13 @@
                             <h7 class="text-gray-800">Petrol Models</h7>
                             <ul class="list-unstyled">
                                 <li v-for="(petrol, index) in group.petrol" :key="index" class="text-gray-900 fs-6">
-                                    <a href="#" @click.prevent="showDetails(petrol)">{{ petrol.engine }} - {{ petrol.year }} - {{ petrol.horsepower }} {{ petrol.ecutype }}</a>
+                                    <a href="#" @click.prevent="showDetails(petrol)">{{ petrol.engine }} - {{ petrol.year }} - {{ petrol.horsepower }} {{ petrol.ecuType }}</a>
                                 </li>
                             </ul>
                             <h7 class="text-gray-800">Diesel Models</h7>
                             <ul class="list-unstyled">
                                 <li v-for="(diesel, index) in group.diesel" :key="index" class="text-gray-900 fs-6">
-                                    <a href="#" @click.prevent="showDetails(diesel)">{{ diesel.engine }} - {{ diesel.year }} - {{ diesel.horsepower }} {{ diesel.ecutype }}</a>
+                                    <a href="#" @click.prevent="showDetails(diesel)">{{ diesel.engine }} - {{ diesel.year }} - {{ diesel.horsepower }} {{ diesel.ecuType }}</a>
                                 </li>
                             </ul>
                         </div>
@@ -83,7 +86,7 @@
 
 
 <script>
-    import { carBrands, tuningDataBaseInfo, tuningSpecialInfo, imagelogosolutions } from './carbrands'; // Import the car brands and tuning data
+    import { imagelogosolutions } from './carbrands'; // Import the car brands and tuning data
     import AvailableSolutions from './AvailableSolutions.vue';
 
     export default {
@@ -95,17 +98,20 @@
                 selectedModel: null,
                 availableSolutions: [],
                 uploadedFile: null,
-                carBrands: carBrands,
+                carBrands: [],
                 imagelogosolutions: imagelogosolutions,
-                tuningSpecialInfo: tuningSpecialInfo,
-                tuningDataBaseInfo: tuningDataBaseInfo,
+                tuningSpecialInfo: [],
+                tuningDataBaseInfo: [],
                 groupedTuningInfo: {},
                 specialInfo: [],
+                isLoading: false,
                 isUploading: false, // Flag to check if uploading is in progress
             };
         },
         components: {
             AvailableSolutions, // Register the component
+        }, mounted() {
+            this.fetchCarBrands(); // Call fetch method on mount
         },
         computed: {
             filteredBrands() {
@@ -134,6 +140,29 @@
             }
         },
         methods: {
+            async fetchCarBrands() {
+                this.isLoading = true; // Set loading to true
+                const apiUrl = import.meta.env.VITE_API_BASE_URL; // Get base URL from environment variables
+
+                try {
+                    const response = await fetch(`${apiUrl}/api/Tuning/carbrands`, {
+                        method: 'GET', // Specify the method
+                        credentials: 'include', // Include credentials such as cookies
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`); // Handle HTTP errors
+                    }
+
+                    const data = await response.json();
+                    this.carBrands = data; // Store fetched car brands in component's data
+                } catch (error) {
+                    console.error('Error fetching car brands:', error); // Log the error for debugging
+                    // You can also set an error state here to inform the user
+                } finally {
+                    this.isLoading = false; // Set loading to false after the request
+                }
+            },
             toggleCheckbox(solution) {
                 // Handle the checkbox toggle event
                 this.availableSolutions.filter(x => x.name === solution.name)[0].checked = !solution.checked;
@@ -157,10 +186,25 @@
                 this.selectedModel = null;
                 this.groupedTuningInfo = {};
             },
-            fetchTuningData(modelId) {
-                const brandInfo = this.tuningDataBaseInfo.find(item => item.id === modelId);
-                if (brandInfo) {
-                    this.groupedTuningInfo = brandInfo.variants.reduce((acc, variant) => {
+            async fetchTuningData(modelId) {
+                const apiUrl = import.meta.env.VITE_API_BASE_URL; // Get base URL from environment variables
+                this.isLoading = true; // Set loading to true while fetching data
+
+                try {
+                    const response = await fetch(`${apiUrl}/api/Tuning/tuningdatabase/${modelId}`, {
+                        method: 'GET', // Specify the method
+                        credentials: 'include', // Include credentials such as cookies
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`); // Handle HTTP errors
+                    }
+
+                    const data = await response.json();
+
+                    // Assuming the response data is structured as expected
+                    this.tuningInfo = data[0]; // Store fetched tuning info
+                    this.groupedTuningInfo = data[0].variants.reduce((acc, variant) => {
                         const key = variant.typeName;
                         if (!acc[key]) {
                             acc[key] = { petrol: [], diesel: [] };
@@ -172,28 +216,46 @@
                         }
                         return acc;
                     }, {});
-                    this.tuningInfo = brandInfo;
-                } else {
-                    this.tuningInfo = null;
-                    this.groupedTuningInfo = {};
+
+                    // Smooth scroll to the tuning information area
+                    this.$nextTick(() => {
+                        const modelArea = document.getElementById('selectModelArea');
+                        if (modelArea) {
+                            modelArea.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    });
+
+                } catch (error) {
+                    console.error('Error fetching tuning data:', error); // Log the error for debugging
+                    // You can also set an error state here to inform the user
+                } finally {
+                    this.isLoading = false; // Set loading to false after the request
                 }
-
-                this.$nextTick(() => {
-                    const modelArea = document.getElementById('selectModelArea');
-                    if (modelArea) {
-                        modelArea.scrollIntoView({ behavior: 'smooth' }); // Smooth scroll to the area
-                    }
-                });
-
             },
-            showDetails(item) {
-                this.availableSolutions = [];
-                this.specialInfo = this.tuningSpecialInfo.find(info => info.id === item.tuning_id);
-                if (this.specialInfo) {
-                    this.availableSolutions = this.specialInfo.availAbleSolution;
-                    this.selectedModel = item;
-                }
+            async showDetails(item) {
+                this.availableSolutions = []; // Clear previous solutions
+                this.selectedModel = item; // Set the currently selected model
+                this.specialInfo = {}; // Reset specialInfo before fetching new data
 
+                try {
+                    // Fetch special tuning info based on tuning_id
+                    const apiUrl = import.meta.env.VITE_API_BASE_URL; // Get base URL from environment variables
+                    const response = await fetch(`${apiUrl}/api/Tuning/tuningspecial/${item.tuningId}`, {
+                        method: 'GET', // Specify the method
+                        credentials: 'include', // Include credentials such as cookies
+                    });
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`); // Handle HTTP errors
+                    }
+
+                    const data = await response.json(); // Parse the JSON response
+                    this.specialInfo = data[0]; // Store the special tuning info in the component's data
+                    // Assuming specialInfo has available solutions, set them here
+                    this.availableSolutions = this.specialInfo.availableSolutions || []; // Set available solutions
+                } catch (error) {
+                    console.error('Error fetching tuning special data:', error); // Log the error for debugging
+                    // Handle any additional error state management here
+                }
             },
             handleFileUpload(event) {
                 const file = event.target.files[0];
