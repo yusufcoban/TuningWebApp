@@ -1,15 +1,14 @@
-﻿using BaseBackend.Models;
-using Dapper;
+﻿using Dapper;
+
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using System.Data.SqlClient;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 
 [ApiController]
 [Route("api")]

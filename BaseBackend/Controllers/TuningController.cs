@@ -10,15 +10,23 @@ namespace YourNamespace.Controllers
     [Authorize] // Ensure only authenticated users can access this controller
     public class TuningController : ControllerBase
     {
-        TuningDatabaseHandler tuningDatabaseHandler = new TuningDatabaseHandler();
-        // Generate fake car brands data
-       
+        private readonly IConfiguration _configuration;
+        private readonly TuningDatabaseHandler _tuningDatabaseHandler;
+
+
+        // Constructor injection for both IConfiguration and TuningDatabaseHandler
+        public TuningController(IConfiguration configuration, TuningDatabaseHandler tuningDatabaseHandler)
+        {
+            _configuration = configuration;
+            _tuningDatabaseHandler = tuningDatabaseHandler ?? throw new ArgumentNullException(nameof(tuningDatabaseHandler));
+        }
+
 
         // 1st API: Get list of all car brands
         [HttpGet("carbrands")]
         public ActionResult<List<CarBrand>> GetCarBrands()
         {
-            return Ok(tuningDatabaseHandler.getCarBrands());
+            return Ok(_tuningDatabaseHandler.getCarBrands());
         }
 
         // 2nd API: Get list of tuning database info by given id
@@ -26,14 +34,14 @@ namespace YourNamespace.Controllers
         public ActionResult<TuningDatabaseInfo> GetTuningDatabaseInfo(string id)
         {
             
-            return Ok(tuningDatabaseHandler.getTuningDatabaseInfoById(id));
+            return Ok(_tuningDatabaseHandler.getTuningDatabaseInfoById(id));
         }
 
         // 3rd API: Get tuning special info by given id
         [HttpGet("tuningspecial/{id}")]
         public ActionResult<TuningSpecialInfo> GetTuningSpecialInfo(string id)
         {
-            return Ok(tuningDatabaseHandler.getTuningSpecialInfoByTuningId(id));
+            return Ok(_tuningDatabaseHandler.getTuningSpecialInfoByTuningId(id));
         }
     }
 }

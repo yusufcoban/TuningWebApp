@@ -7,10 +7,12 @@ namespace BaseBackend.Models
         public string Id { get; set; }
         public string Name { get; set; }
         public string Icon { get; set; }
+        public string CarBrandId { get; set; } 
     }
 
     public class CarBrand
     {
+        public string Id { get; set; }
         public string Name { get; set; }
         public string Icon { get; set; }
         public string Slug { get; set; }
