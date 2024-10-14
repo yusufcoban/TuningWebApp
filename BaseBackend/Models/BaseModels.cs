@@ -70,7 +70,6 @@ namespace BaseBackend.Models
         public int ConnectionInfoId { get; set; }
         public List<GroupedConnectionInfo> GroupedAvailableConnections { get; set; } = new List<GroupedConnectionInfo>(); // Initialize list
 
-        public TuningToolsInfo TuningToolsInfo { get; set; }
         public List<ConnectionInfo> AvailableConnection { get; set; } = new List<ConnectionInfo>(); // Initialize list
 
         public void initi_after()

@@ -12,7 +12,7 @@
                     <strong>{{ tool.toolName }}</strong>
                     <ul>
                         <li v-for="(connection, index) in tool.connectionTypes" :key="index" class="text-gray-700 fs-6">
-                            Connection Type: {{ connection }}
+                            Mode: {{ connection }}
                         </li>
                     </ul>
                 </li>
