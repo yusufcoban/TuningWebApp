@@ -8,11 +8,11 @@
             </ul>
             <h6 class="text-gray-800 w-bolder mb-2">Tuning Tools Info</h6>
             <ul class="list-unstyled">
-                <li v-for="(tool, toolName) in ecuInfoSelected?.tuningToolsInfo" :key="toolName" class="text-gray-900 fs-6">
-                    <strong>{{ toolName }}</strong>
+                <li v-for="(tool, toolName) in ecuInfoSelected?.groupedAvailableConnections" :key="toolName" class="text-gray-900 fs-6">
+                    <strong>{{ tool.toolName }}</strong>
                     <ul>
-                        <li v-for="(connection, index) in tool.availableConnection" :key="index" class="text-gray-700 fs-6">
-                            Connection Type: {{ connection.type }}
+                        <li v-for="(connection, index) in tool.connectionTypes" :key="index" class="text-gray-700 fs-6">
+                            Connection Type: {{ connection }}
                         </li>
                     </ul>
                 </li>

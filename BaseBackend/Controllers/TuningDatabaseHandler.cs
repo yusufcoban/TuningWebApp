@@ -19,7 +19,7 @@ namespace YourNamespace.Controllers
         }
 
         // Generate fake tuning special info data
-        private static List<TuningSpecialInfo> tuningSpecialInfos = new List<TuningSpecialInfo>
+        /*private static List<TuningSpecialInfo> tuningSpecialInfos = new List<TuningSpecialInfo>
         {
           new TuningSpecialInfo
             {
@@ -465,11 +465,8 @@ namespace YourNamespace.Controllers
 
         };
 
+        */
 
-        public List<TuningSpecialInfo> getTuningSpecialInfoByTuningId_old(string Id = "")
-        {
-            return tuningSpecialInfos.Where(x => x.Id.Equals(Id)).ToList();
-        }
 
         public List<CarBrand> getCarBrands()
         {
@@ -517,10 +514,59 @@ namespace YourNamespace.Controllers
                 return carBrands.ToList(); // Return the list of TuningDatabaseInfo with variants
             }
         }
+
+
         public List<TuningSpecialInfo> getTuningSpecialInfoByTuningId(string id)
         {
-            return tuningSpecialInfos.Where(x => x.Id.Equals(id)).ToList();
+            using (var con = new SqlConnection(_configuration.GetConnectionString("dbo")))
+            {
+                // Open the connection
+                con.Open();
+
+                // SQL query to fetch tuning special info by Tuning ID
+                var query = "SELECT * FROM TuningSpecialInfo WHERE Id = @Id";
+
+                // Fetching data and mapping to List<TuningSpecialInfo>
+                var tuningSpecialInfos = con.Query<TuningSpecialInfo>(query, new { Id = id }).ToList();
+
+                // Load related data, e.g., AvailableSolutions or EcuInfo if needed
+                foreach (var tuningSpecialInfo in tuningSpecialInfos)
+                {
+                    // Assuming AvailableSolutions are in another table
+                    tuningSpecialInfo.AvailableSolutions = GetAvailableSolutionsByTuningId(tuningSpecialInfo.Id);
+                    tuningSpecialInfo.EcuInfo = GetEcuInfoByTuningId(tuningSpecialInfo.EcuInfoId);
+                    tuningSpecialInfo.EcuInfo.initi_after();
+                }
+
+                return tuningSpecialInfos;
+            }
         }
+
+        // Example of fetching AvailableSolutions (adjust based on your structure)
+        private List<AvailableSolution> GetAvailableSolutionsByTuningId(string tuningId)
+        {
+            using (var con = new SqlConnection(_configuration.GetConnectionString("dbo")))
+            {
+                con.Open();
+                var query = "SELECT * FROM AvailableSolution WHERE [TuningSpecialInfoId] = @TuningId"; // Adjust table/column names accordingly
+                return con.Query<AvailableSolution>(query, new { TuningId = tuningId }).ToList();
+            }
+        }
+
+        // Example of fetching EcuInfo (adjust based on your structure)
+        private EcuInfo GetEcuInfoByTuningId(int ecuinfoid)
+        {
+            using (var con = new SqlConnection(_configuration.GetConnectionString("dbo")))
+            {
+                con.Open();
+                var query = "SELECT * FROM [EcuInfo] WHERE [id] = @ecuinfoid"; // Adjust table/column names accordingly
+                EcuInfo result = con.QueryFirstOrDefault<EcuInfo>(query, new { ecuinfoid });
+                var query2 = "SELECT * FROM [ConnectionInfo] WHERE [id] = @resultId"; // Adjust table/column names accordingly
+                result.AvailableConnection = con.Query<BaseBackend.Models.ConnectionInfo>(query2, new { resultId = result.ConnectionInfoId }).ToList();
+                return result;
+            }
+        }
+
     }
 
 }
