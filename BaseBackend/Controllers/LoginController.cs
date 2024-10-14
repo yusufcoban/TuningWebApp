@@ -69,7 +69,7 @@ public class AuthController : ControllerBase
     }
 
     // Inserts users with hashed passwords into the database
-    public void InsertUsers((string username, string password)[] users, string role = "User")
+    private void InsertUsers((string username, string password)[] users, string role = "User")
     {
         using (var connection = new SqlConnection(_configuration.GetConnectionString("dbo")))
         {
@@ -112,7 +112,7 @@ public class AuthController : ControllerBase
     }
 
     // Method to hash the password using SHA-256
-    public string HashPassword(string password)
+    private string HashPassword(string password)
     {
         using (SHA256 sha256Hash = SHA256.Create())
         {
@@ -128,7 +128,7 @@ public class AuthController : ControllerBase
     }
 
     // Method to verify if a password matches the stored hash
-    public bool VerifyPassword(string inputPassword, string storedHash)
+    private bool VerifyPassword(string inputPassword, string storedHash)
     {
         string inputHash = HashPassword(inputPassword);
         return inputHash.Equals(storedHash);
