@@ -1,5 +1,5 @@
 import { createStore } from 'vuex';
-
+import 'vue-neat-modal/dist/vue-neat-modal.css'
 const store = createStore({
     state() {
         return {

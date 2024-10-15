@@ -47,10 +47,14 @@
 
         <span v-if="isAdmin && preselectedModelId!=null" class="plus-icon" title="Add New Model">
             <span @click="openModal(preselectedModelId)" class="plus-icon" title="Add New Model" data-bs-toggle="modal" data-bs-target="#addModelModal">
-                <button class="btn btn-primary mt-4" >
+                <button class="btn btn-primary mt-4">
                     <font-awesome-icon icon="plus" /> New model
                 </button>
+                <div>
 
+
+
+                </div>
             </span>
         </span>
 
@@ -101,6 +105,63 @@
                             @toggle-checkbox="toggleCheckbox"
                             @show-more-details="showMoreDetails"
                             @cancel-upload="cancelUpload" />
+
+
+
+        <Modal v-model="isOpenFromOutside" :fullscreen="false" :clickOut="true" style="margin-left: 5vw">
+            <div class="modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content" style="min-width: 400px;">
+                        <div class="modal-header">
+                            <!-- ICON of find in selectedMake.models by id=> .icon -->
+                            <!-- name of find in selectedMake.models by id => .name -->
+                            <!-- preselectedModelId find in selectedMake.models by id.....-->
+                            <div class="mb-4">
+                                <img :src="getModelByGivenId(preselectedModelId).icon" class="brand-icon">
+                            </div>
+                            <h5 class="modal-title">{{getModelByGivenId(preselectedModelId)?.name}}</h5>
+                            <button type="button" class="close" @click="close_Modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="input-group mb-3">
+                              <form @submit.prevent="submitForm">
+                            <div class="form-group">
+                                <label for="yearStart">Year Start</label>
+                                <input type="number" id="yearStart" v-model="formData.yearStart" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="yearEnd">Year End</label>
+                                <input type="number" id="yearEnd" v-model="formData.yearEnd" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="engineName">Engine Name</label>
+                                <input type="text" id="engineName" v-model="formData.engineName" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="enginePowerKw">Engine Power (kW)</label>
+                                <input type="number" id="enginePowerKw" v-model="formData.enginePowerKw" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="fuelVariant">Fuel Variant</label>
+                                <input type="text" id="fuelVariant" v-model="formData.fuelVariant" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="specialInfo">Special Info</label>
+                                <textarea id="specialInfo" v-model="formData.specialInfo" class="form-control" rows="3"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </form>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" @click="close_Modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </Modal>
     </div>
 </template>
 
@@ -109,6 +170,7 @@
     import { imagelogosolutions } from './carbrands'; // Import the car brands and tuning data
     import AvailableSolutions from './AvailableSolutions.vue';
     import { mapState } from 'vuex'; // Import mapState for accessing Vuex state
+    import { Modal } from 'vue-neat-modal'
 
     export default {
         data() {
@@ -127,11 +189,21 @@
                 preselectedModelId: null,
                 specialInfo: [],
                 isLoading: false,
-                isUploading: false, // Flag to check if uploading is in progress
+                isOpenFromOutside: false,
+                isUploading: false,
+                formData: {
+                    yearStart: 0,
+                    yearEnd: 0,
+                    engineName: '',
+                    enginePowerKw: 0,
+                    fuelVariant: '',
+                    specialInfo: '',
+                },
             };
         },
         components: {
-            AvailableSolutions
+            AvailableSolutions,
+            Modal
         }, mounted() {
             this.fetchCarBrands(); // Call fetch method on mount
         },
@@ -166,11 +238,44 @@
             }
         },
         methods: {
+            getModelByGivenId: function (id) {
+                if (this.selectedMake != null) {
+                    if (this.selectedMake.models != null) {
+                        return this.selectedMake.models.find((ele) => ele.id == id);
+                    }
+                }
+            },
+            open_Modal() {
+                this.isOpenFromOutside = true; // Open modal
+            },
+            close_Modal() {
+                this.isOpenFromOutside = false; // Close modal
+                this.resetForm();
+            },
+            resetForm() {
+                this.formData = {
+                    yearStart: 0,
+                    yearEnd: 0,
+                    engineName: '',
+                    enginePowerKw: 0,
+                    fuelVariant: '',
+                    specialInfo: '',
+                };
+            },
+            submitForm() {
+                // Handle form submission, e.g., sending formData to an API
+                console.log("Form submitted:", this.formData);
+                // Close the modal after submission
+                this.close_Modal();
+            },
             openModal(types) {
+                this.open_Modal();
                 //CarBrand => Add new Model Golf 9
                 console.log(types)
             },
             openModalByName(typeName) {
+                this.open_Modal();
+
                 //Here i got typeName already....open modal with given typeName
             },
             async fetchCarBrands() {
@@ -331,6 +436,19 @@
 
 
 <style scoped>
+    .modal
+    {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1050;
+        width: 100%;
+        display: flex;
+        height: 100%;
+        overflow: hidden;
+        outline: 0;
+    }
+
     .auto-data
     {
         text-align: center;
