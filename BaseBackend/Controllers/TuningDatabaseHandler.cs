@@ -88,7 +88,10 @@ namespace YourNamespace.Controllers
                     // Assuming AvailableSolutions are in another table
                     tuningSpecialInfo.AvailableSolutions = GetAvailableSolutionsByTuningId(tuningSpecialInfo.Id);
                     tuningSpecialInfo.EcuInfo = GetEcuInfoByTuningId(tuningSpecialInfo.EcuInfoId);
-                    tuningSpecialInfo.EcuInfo.initi_after();
+                    if (tuningSpecialInfo.EcuInfo != null)
+                    {
+                        tuningSpecialInfo.EcuInfo.initi_after();
+                    }
                 }
 
                 return tuningSpecialInfos;
@@ -114,8 +117,21 @@ namespace YourNamespace.Controllers
                 con.Open();
                 var query = "SELECT * FROM [EcuInfo] WHERE [id] = @ecuinfoid"; // Adjust table/column names accordingly
                 EcuInfo result = con.QueryFirstOrDefault<EcuInfo>(query, new { ecuinfoid });
-                var query2 = "SELECT * FROM [ConnectionInfo] WHERE [id] = @resultId"; // Adjust table/column names accordingly
-                result.AvailableConnection = con.Query<BaseBackend.Models.ConnectionInfo>(query2, new { resultId = result.ConnectionInfoId }).ToList();
+                if (result != null)
+                {
+                    var query2 = "SELECT * FROM [ConnectionInfo] WHERE [id] = @resultId"; // Adjust table/column names accordingly
+                    var resultList = con.Query<BaseBackend.Models.ConnectionInfo>(query2, new { resultId = result?.ConnectionInfoId });
+                    if (resultList != null && resultList.Any())
+                    {
+                        result.AvailableConnection = resultList.ToList();
+                    }
+                    else
+                    {
+                        result.AvailableConnection = new List<BaseBackend.Models.ConnectionInfo>();
+                    }
+                }
+
+
                 return result;
             }
         }

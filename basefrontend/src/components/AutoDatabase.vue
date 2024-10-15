@@ -71,7 +71,7 @@
                             <span v-if="1==1" class="plus-icon" title="Add New Model">
                                 <span @click="openModalByName(typeName)" class="plus-icon" title="Add New Model" data-bs-toggle="modal" data-bs-target="#addModelModal">
                                     <button v-if="isAdmin" class="btn btn-primary btn-sm">
-                                        <font-awesome-icon icon="plus" />
+                                        <font-awesome-icon icon="plus" /> New variant
                                     </button>
                                 </span>
                             </span>
@@ -153,8 +153,8 @@
                                     <div class="col-xs-4 form-group">
                                         <label for="fuelVariant">Fuel Variant</label>
                                         <select id="fuelVariant" v-model="formData.fuelVariant" class="form-control" required>
-                                            <option value="Petrol">Petrol</option>
-                                            <option value="Diesel">Diesel</option>
+                                            <option value="petrol">Petrol</option>
+                                            <option value="diesel">Diesel</option>
                                         </select>
                                     </div>
                                     <div class="col-xs-4 form-group">
@@ -206,12 +206,12 @@
             </div>
         </Modal>
 
-        <!-- Repeat similar improvements for the second Modal -->
 
         <Modal v-model="isOpenFromOutsideModel" :fullscreen="false" :clickOut="true" style="margin-left: 5vw;">
             <div class="modal" tabindex="-1" role="dialog">
                 <div class="modal-dialog" role="document">
-                    <div class="modal-content" style="min-width: 400px;">
+                    <div class="modal-content" style="min-width: 100em;">
+                        <!-- Match the first modal's min-width -->
                         <div class="modal-header">
                             <div class="mb-4">
                                 <img :src="getModelByGivenId(preselectedModelId).icon" class="brand-icon" style="width: 50px; height: auto;">
@@ -257,8 +257,8 @@
                                     <div class="col-xs-4 form-group">
                                         <label for="fuelVariant">Fuel Variant</label>
                                         <select id="fuelVariant" v-model="formData.fuelVariant" class="form-control" required>
-                                            <option value="Petrol">Petrol</option>
-                                            <option value="Diesel">Diesel</option>
+                                            <option value="petrol">Petrol</option>
+                                            <option value="diesel">Diesel</option>
                                         </select>
                                     </div>
                                     <div class="col-xs-4 form-group">
@@ -310,6 +310,7 @@
                 </div>
             </div>
         </Modal>
+
 
     </div>
 </template>
@@ -417,10 +418,10 @@
                 this.checkableItems.forEach(item => {
                     if (item.checked) {
                         this.formData.availableSolutions.push({
-                            name: item.label, // Get name from the label
-                            information: "string", // Replace with the actual information if needed
-                            value1: item.value1, // Get value1 from the item's value1
-                            value2: item.value2  // Get value2 from the item's value2
+                            Name: item.label, // Get name from the label
+                            Information: "string", // Replace with the actual information if needed
+                            Value1: item.value1, // Get value1 from the item's value1
+                            Value2: item.value2  // Get value2 from the item's value2
                         });
                     }
                 });
@@ -473,11 +474,54 @@
                     item.value2 = 0; // Reset value2 to 0
                 });
             },
-            submitForm() {
-                // Handle form submission, e.g., sending formData to an API
-                console.log("Form submitted:", this.formData);
-                // Close the modal after submission
-                this.close_Modal();
+            async submitForm() {
+                // Construct the data according to the InputNewVariant model
+                const inputNewVariant = {
+                    CarBrand: {
+                        id: this.preselectedModelId
+                    },
+                    TypeName: this.formData.typeName,
+                    YearStart: this.formData.yearStart,
+                    YearEnd: this.formData.yearEnd,
+                    EngineName: this.formData.engineName,
+                    EnginePowerKw: this.formData.enginePowerKw,
+                    FuelVariant: this.formData.fuelVariant,
+                    SpecialInfo: this.formData.specialInfo,
+                    SelectedEcu: {
+                        // Assuming SelectedEcu should contain id and other properties
+                        id: this.formData.selectedEcu.id,
+                        // Add other properties of input_SelectedEcu as needed
+                    },
+                    AvailableSolutions: this.formData.availableSolutions
+                };
+
+                try {
+                    const apiUrl = import.meta.env.VITE_API_BASE_URL; // Define your API URL here
+                    const response = await fetch(`${apiUrl}/api/Tuning/GenerateTuningVariant`, {
+                        method: 'POST', // Specify the method
+                        headers: {
+                            'Content-Type': 'application/json', // Set the content type to JSON
+                        },
+                        credentials: 'include', // Include credentials such as cookies
+                        body: JSON.stringify(inputNewVariant), // Send the constructed data as JSON
+                    });
+
+                    // Handle response
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    this.closemodal();
+                    this.close_Modal();
+
+                    const result = await response.json();
+                    console.log('Success:', result);
+                    // Handle success (e.g., show a success message, close the modal, etc.)
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    // Handle error (e.g., show an error message to the user)
+                }
+
             },
             openModal(types) {
                 this.open_Modal();
@@ -575,10 +619,13 @@
                         console.log('Processing variant:', variant);
                         console.log('Variant Info:', variantInfo);
 
-                        // Push to the appropriate array based on the variant type
-                        if (variant.variant === 'petrol') {
+                        // Normalize the case of the variant type for comparison
+                        const variantType = variant.variant.toLowerCase(); // Convert to lowercase
+
+                        // Push to the appropriate array based on the normalized variant type
+                        if (variantType === 'petrol') {
                             acc[key].petrol.push(variantInfo);
-                        } else if (variant.variant === 'diesel') {
+                        } else if (variantType === 'diesel') {
                             acc[key].diesel.push(variantInfo);
                         }
 
@@ -661,8 +708,9 @@
     .modal-body
     {
         overflow-y: scroll;
-        height:1050px
+        height: 1050px
     }
+
     .modal-dialog
     {
         max-width: 100%;

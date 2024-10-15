@@ -44,7 +44,7 @@ namespace YourNamespace.Controllers
             return Ok(_tuningDatabaseHandler.getTuningSpecialInfoByTuningId(id));
         }
 
-        [HttpPost]
+        [HttpPost("GenerateTuningVariant")]
         public ActionResult<TuningSpecialInfo> GenerateTuningVariant(InputNewVariant inputNewVariant)
         {
             return Ok(_tuningDatabaseHandler.GenerateTuningVariant(inputNewVariant));
