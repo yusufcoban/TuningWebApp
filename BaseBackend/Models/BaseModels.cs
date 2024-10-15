@@ -28,7 +28,6 @@ namespace BaseBackend.Models
         public string Engine { get; set; }
         public string Horsepower { get; set; }
         public string Variant { get; set; }
-        public string EcuType { get; set; }
         public string TuningId { get; set; }
     }
 
@@ -66,6 +65,7 @@ namespace BaseBackend.Models
 
     public class EcuInfo
     {
+        public int Id { get; set; }
         public string EcuName { get; set; }
         public int ConnectionInfoId { get; set; }
         public List<GroupedConnectionInfo> GroupedAvailableConnections { get; set; } = new List<GroupedConnectionInfo>(); // Initialize list

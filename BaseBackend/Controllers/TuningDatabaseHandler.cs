@@ -4,6 +4,7 @@ using Dapper;
 
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.Extensions.Configuration;
+using Microsoft.VisualBasic;
 
 using System.Data.SqlClient;
 using System.Runtime.CompilerServices;
@@ -119,27 +120,138 @@ namespace YourNamespace.Controllers
             }
         }
 
-        private string GenerateTuningVariant(CarBrand carBrand, string typeName, int yearStart, int yearEnd, string engineName, int enginePowerKw, string fuelVariant, string specialInfo, EcuInfo selectedEcu, List<AvailableSolution> availableSolutions)
+        public string GenerateTuningVariant(InputNewVariant inputNewVariant)
         {
-            //carBrand => Golf
-            //typeName Golf4=> will be typeName
-            //specialInfo=>TuningSpecialInfo with ecuinfo NEW for link
-            //generate carBrandid_NEWNUMEBR for  [TuningVariant] and [TuningSpecialInfo]
-            //carBrandid_NEWNUMEBR => availableSolutions add new entries in db
+            // Generate a unique identifier for the tuning variant using the car brand's ID, e.g., "12_1"
+            string newTuningVariantId = getFreeTuningSpecialName(inputNewVariant.CarBrand.Id); // e.g., "12_1_1"
 
-            return "";
+            // Insert a new record into the TuningVariant table with the provided details (e.g., "Golf4", "2000-2005", engine details)
+            CreateNewTuningVariant(newTuningVariantId, inputNewVariant.TypeName, $"{inputNewVariant.YearStart}-{inputNewVariant.YearEnd}", inputNewVariant.EngineName, inputNewVariant.EnginePowerKw.ToString(), inputNewVariant.FuelVariant);
+
+            // Insert a new record into the TuningSpecialInfo table, associating it with the selected ECU info and special details
+            CreateNewTuningSpecialInfo(newTuningVariantId, inputNewVariant.SpecialInfo, inputNewVariant.SelectedEcu.Id);
+
+            // Loop through the list of available solutions and insert each into the AvailableSolution table
+            foreach (var solution in inputNewVariant.AvailableSolutions)
+            {
+                CreateNewAvailableSolution(newTuningVariantId, solution.Name, solution.Information, solution.Value1, solution.Value2);
+            }
+
+            // Return the new TuningVariantId or a success message indicating the tuning variant has been created
+            return newTuningVariantId; // or return a confirmation message
         }
-        private string GenerateTuningSpecialInfo(TuningSpecialInfo createNewTuningSpecialInfo)
+
+        private void CreateNewTuningSpecialInfo(string newTuningVariantIdSpecial, string specialInfo, int ecuId)
         {
-            return "";
+            // Define the SQL query for inserting a new record
+            string query = @"
+                             INSERT INTO [dbo].[TuningSpecialInfo] (Id, AdditionalInformation, EcuInfoId)
+                                VALUES (@Id, @AdditionalInformation, @EcuInfoId)";
 
+            // Use the using statement to ensure proper disposal of the connection
+            using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("dbo")))
+            {
+                // Open the connection
+                conn.Open();
+
+                // Execute the query using Dapper's Execute method, passing in the parameters as an anonymous object
+                conn.Execute(query, new
+                {
+                    Id = newTuningVariantIdSpecial,
+                    AdditionalInformation = string.IsNullOrEmpty(specialInfo) ? null : specialInfo,
+                    EcuInfoId = ecuId > 0 ? ecuId : (int?)null
+                });
+            }
         }
+
+        private void CreateNewTuningVariant(string newTuningVariantId, string typeName, string year, string engineName, string horsepower, string fuelVariant)
+        {
+            // Step 1: Define the SQL query for inserting a new record into the TuningVariant table
+            string query = @"
+                              INSERT INTO [dbo].[TuningVariant] (TuningId, TypeName, Year, Engine, Horsepower, Variant)
+                              VALUES (@TuningId, @TypeName, @Year, @Engine, @Horsepower, @Variant)";
+
+            // Step 2: Use the 'using' statement to ensure proper disposal of the connection
+            using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("dbo")))
+            {
+                // Step 3: Open the connection
+                conn.Open();
+
+                // Step 4: Execute the query using Dapper's Execute method, passing the parameters as an anonymous object
+                conn.Execute(query, new
+                {
+                    TuningId = newTuningVariantId,
+                    TypeName = typeName,
+                    Year = year,
+                    Engine = engineName,
+                    Horsepower = horsepower,
+                    Variant = fuelVariant
+                });
+            }
+        }
+
+        private void CreateNewAvailableSolution(string newTuningVariantIdSpecial, string name, string information, int value1, int value2)
+        {
+            // Define the SQL query for inserting a new record into the AvailableSolution table
+            string query = @"
+                             INSERT INTO [dbo].[AvailableSolution] (TuningSpecialInfoId, Name, Information, Value1, Value2, Checked)
+                             VALUES (@TuningSpecialInfoId, @Name, @Information, @Value1, @Value2, @Checked)";
+
+            // Use the 'using' statement to ensure proper disposal of the connection
+            using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("dbo")))
+            {
+                // Open the connection
+                conn.Open();
+
+                // Execute the query using Dapper's Execute method, passing in the parameters
+                conn.Execute(query, new
+                {
+                    TuningSpecialInfoId = newTuningVariantIdSpecial,
+                    Name = name,
+                    Information = string.IsNullOrEmpty(information) ? null : information,
+                    Value1 = value1,
+                    Value2 = value2,
+                    Checked = false // default to unchecked, you can change it based on your requirements
+                });
+            }
+        }
+
         private string getFreeTuningSpecialName(string carBrandId)
         {
-            //fetch like 12_X from [TuningVariant] if available, if not return 12_1_1. IF available split string by _ char and increase last one by 1 and return
-            return "";
-        }
+            // Fetch like `1_2_X` from [TuningSpecialInfo] if available, if not return `1_2_1`.
+            // If available, split the string by `_` and increase the last part by 1 and return.
+            using (var con = new SqlConnection(_configuration.GetConnectionString("dbo")))
+            {
+                con.Open();
+                // Modify the query to search for all entries starting with the carBrandId (e.g., "1_2%")
+                string query = "SELECT [TuningId] FROM [dbo].[TuningVariant] WHERE [TuningId] LIKE @carBrandId + '%'";
+                List<string> result = con.Query<string>(query, new { carBrandId }).ToList();
 
+                // Check if the result contains any entries
+                if (result != null && result.Any())
+                {
+                    // Parse the IDs to get the highest suffix number
+                    int highestDigit = 0;
+                    foreach (var item in result)
+                    {
+                        // Split the ID by `_` and take the last part (the numeric suffix)
+                        int lastDigit = int.Parse(item.Split('_').Last());
+
+                        // Find the highest suffix number
+                        if (lastDigit > highestDigit)
+                        {
+                            highestDigit = lastDigit;
+                        }
+                    }
+
+                    // Return the new ID with the incremented suffix
+                    return carBrandId + "_" + (highestDigit + 1);
+                }
+
+                // If no results, return carBrandId with `_1` as the initial suffix
+                return carBrandId + "_1";
+            }
+        }
     }
 
 }

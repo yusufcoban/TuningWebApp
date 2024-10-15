@@ -33,7 +33,7 @@ namespace YourNamespace.Controllers
         [HttpGet("tuningdatabase/{id}")]
         public ActionResult<TuningDatabaseInfo> GetTuningDatabaseInfo(string id)
         {
-            
+
             return Ok(_tuningDatabaseHandler.getTuningDatabaseInfoById(id));
         }
 
@@ -42,6 +42,12 @@ namespace YourNamespace.Controllers
         public ActionResult<TuningSpecialInfo> GetTuningSpecialInfo(string id)
         {
             return Ok(_tuningDatabaseHandler.getTuningSpecialInfoByTuningId(id));
+        }
+
+        [HttpPost]
+        public ActionResult<TuningSpecialInfo> GenerateTuningVariant(InputNewVariant inputNewVariant)
+        {
+            return Ok(_tuningDatabaseHandler.GenerateTuningVariant(inputNewVariant));
         }
     }
 }
