@@ -45,14 +45,33 @@
             </div>
         </div>
 
+        <span v-if="isAdmin && preselectedModelId!=null" class="plus-icon" title="Add New Model">
+            <span @click="openModal(preselectedModelId)" class="plus-icon" title="Add New Model" data-bs-toggle="modal" data-bs-target="#addModelModal">
+                <button class="btn btn-primary mt-4" >
+                    <font-awesome-icon icon="plus" /> New model
+                </button>
+
+            </span>
+        </span>
+
         <div v-if="tuningInfo && !isUploading && selectedModel == null" class="tuning-info mt-5" id="selectModelArea">
             <h5 class="text-gray-800 w-bolder mb-4">Tuning Information</h5>
+
             <div class="tuning-row">
+
                 <div v-for="(group, typeName) in groupedTuningInfo" :key="typeName" class="tuning-card">
                     <!-- Card for each tuning group -->
                     <div class="card mb-4">
                         <div class="card-header text-left">
                             <h6 class="text-gray-800 w-bolder underline-header">{{ typeName }}</h6>
+                            <span v-if="1==1" class="plus-icon" title="Add New Model">
+                                <span @click="openModalByName(typeName)" class="plus-icon" title="Add New Model" data-bs-toggle="modal" data-bs-target="#addModelModal">
+                                    <button v-if="isAdmin" class="btn btn-primary btn-sm">
+                                        <font-awesome-icon icon="plus" />
+
+                                    </button>
+                                </span>
+                            </span>
                         </div>
                         <div class="card-body">
                             <h7 class="text-gray-800">Petrol Models</h7>
@@ -73,6 +92,7 @@
             </div>
         </div>
 
+
         <!-- Available Solutions Component -->
         <AvailableSolutions v-if="selectedModel" :solutions="availableSolutionsWithLogos"
                             :additionalInformation="additionalInformation"
@@ -88,6 +108,7 @@
 <script>
     import { imagelogosolutions } from './carbrands'; // Import the car brands and tuning data
     import AvailableSolutions from './AvailableSolutions.vue';
+    import { mapState } from 'vuex'; // Import mapState for accessing Vuex state
 
     export default {
         data() {
@@ -103,17 +124,22 @@
                 tuningSpecialInfo: [],
                 tuningDataBaseInfo: [],
                 groupedTuningInfo: {},
+                preselectedModelId: null,
                 specialInfo: [],
                 isLoading: false,
                 isUploading: false, // Flag to check if uploading is in progress
             };
         },
         components: {
-            AvailableSolutions, // Register the component
+            AvailableSolutions
         }, mounted() {
             this.fetchCarBrands(); // Call fetch method on mount
         },
         computed: {
+            ...mapState(['user']),
+            isAdmin() {
+                return this.user && this.user.role === 'Admin'; // Adjust this as per your logic for admins
+            },
             filteredBrands() {
                 return this.carBrands.filter(brand =>
                     brand.name.toLowerCase().includes(this.searchTerm.toLowerCase())
@@ -140,6 +166,13 @@
             }
         },
         methods: {
+            openModal(types) {
+                //CarBrand => Add new Model Golf 9
+                console.log(types)
+            },
+            openModalByName(typeName) {
+                //Here i got typeName already....open modal with given typeName
+            },
             async fetchCarBrands() {
                 this.isLoading = true; // Set loading to true
                 const apiUrl = import.meta.env.VITE_API_BASE_URL; // Get base URL from environment variables
@@ -184,9 +217,11 @@
                 this.selectedMake = null;
                 this.tuningInfo = null;
                 this.selectedModel = null;
+                this.preselectedModelId = null;
                 this.groupedTuningInfo = {};
             },
             async fetchTuningData(modelId) {
+                this.preselectedModelId = modelId;
                 const apiUrl = import.meta.env.VITE_API_BASE_URL; // Get base URL from environment variables
                 this.isLoading = true; // Set loading to true while fetching data
 
@@ -202,20 +237,38 @@
 
                     const data = await response.json();
 
-                    // Assuming the response data is structured as expected
                     this.tuningInfo = data[0]; // Store fetched tuning info
+                    // Group tuning info by type and include tuningId in each variant
                     this.groupedTuningInfo = data[0].variants.reduce((acc, variant) => {
-                        const key = variant.typeName;
+                        const key = variant.typeName; // Use the typeName as the key
+
+                        // Check if the accumulator for the key already exists; if not, create it
                         if (!acc[key]) {
-                            acc[key] = { petrol: [], diesel: [] };
+                            acc[key] = { petrol: [], diesel: [] }; // Initialize arrays for petrol and diesel
                         }
+
+                        // Create a new object that includes the tuningId and other variant data
+                        const variantInfo = {
+                            tuningId: variant.tuningId, // Save the tuningId
+                            ...variant // Spread the rest of the variant properties
+                        };
+
+                        // Debugging step to log the variantInfo object
+                        console.log('Processing variant:', variant);
+                        console.log('Variant Info:', variantInfo);
+
+                        // Push to the appropriate array based on the variant type
                         if (variant.variant === 'petrol') {
-                            acc[key].petrol.push(variant);
+                            acc[key].petrol.push(variantInfo);
                         } else if (variant.variant === 'diesel') {
-                            acc[key].diesel.push(variant);
+                            acc[key].diesel.push(variantInfo);
                         }
+
                         return acc;
                     }, {});
+
+                    // Debugging step to check the final grouped tuning info
+                    console.log('Grouped Tuning Info:', this.groupedTuningInfo);
 
                     // Smooth scroll to the tuning information area
                     this.$nextTick(() => {

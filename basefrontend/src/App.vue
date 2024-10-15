@@ -20,7 +20,7 @@
 
 
             <ul class="menu list-unstyled">
-                <li class="sidebar-item" v-if="!isAdmin">
+                <li class="sidebar-item" >
                     <router-link to="/UploadFile" class="sidebar-link">
                         <i class="bi bi-grid-fill"></i>
                         Upload File
