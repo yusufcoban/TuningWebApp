@@ -45,16 +45,19 @@
             </div>
         </div>
 
-        <span v-if="isAdmin && preselectedModelId!=null" class="plus-icon" title="Add New Model">
+        <span v-if="isAdmin && !selectedModel && selectedMake!=null" class="plus-icon" title="Add New Model">
+            <span @click="" class="plus-icon" title="Add New Model" data-bs-toggle="modal" data-bs-target="#addModelModal">
+                <button class="btn btn-primary mt-4">
+                    <font-awesome-icon icon="plus" /> New Model(not implemented)
+                </button>
+            </span>
+            <br />
+        </span>
+        <span v-if="isAdmin && preselectedModelId!=null && !selectedModel" class="plus-icon" title="Add New Model">
             <span @click="openModal(preselectedModelId)" class="plus-icon" title="Add New Model" data-bs-toggle="modal" data-bs-target="#addModelModal">
                 <button class="btn btn-primary mt-4">
-                    <font-awesome-icon icon="plus" /> New model
+                    <font-awesome-icon icon="plus" /> New Variant
                 </button>
-                <div>
-
-
-
-                </div>
             </span>
         </span>
 
@@ -433,7 +436,6 @@
                     }
                 }
             },
-
             open_Modal_Model() {
                 this.formData.carBrand.id = this.preselectedModelId;
                 this.formData.typeName = this.preselectedtypeName;
@@ -510,9 +512,9 @@
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
                     }
-                    this.closemodal();
                     this.close_Modal();
-
+                    this.close_Modal_Model();
+                    this.fetchTuningData(this.preselectedModelId);
                     const result = await response.json();
                     console.log('Success:', result);
                     // Handle success (e.g., show a success message, close the modal, etc.)

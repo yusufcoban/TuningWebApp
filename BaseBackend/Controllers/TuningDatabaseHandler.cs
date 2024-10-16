@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualBasic;
 
+using System;
 using System.Data.SqlClient;
 using System.Runtime.CompilerServices;
 
@@ -140,7 +141,7 @@ namespace YourNamespace.Controllers
         {
             // Generate a unique identifier for the tuning variant using the car brand's ID, e.g., "12_1"
             string newTuningVariantId = getFreeTuningSpecialName(inputNewVariant.CarBrand.Id); // e.g., "12_1_1"
-
+            VerifyTuningDatabaseInfo(inputNewVariant);
             // Insert a new record into the TuningVariant table with the provided details (e.g., "Golf4", "2000-2005", engine details)
             CreateNewTuningVariant(newTuningVariantId, inputNewVariant.TypeName, $"{inputNewVariant.YearStart}-{inputNewVariant.YearEnd}", inputNewVariant.EngineName, inputNewVariant.EnginePowerKw.ToString(), inputNewVariant.FuelVariant);
 
@@ -157,6 +158,61 @@ namespace YourNamespace.Controllers
             return newTuningVariantId; // or return a confirmation message
         }
 
+        private void VerifyTuningDatabaseInfo(InputNewVariant inputNewVariant)
+        {
+            string query = @"
+                             SELECT  [Id]
+                              ,[Brand]
+                              ,[Information]
+                          FROM [dbo].[TuningDatabaseInfo] Where Id=@id
+                        ";
+            using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("dbo")))
+            {
+                // Open the connection
+                conn.Open();
+
+                // Execute the query using Dapper's Execute method, passing in the parameters as an anonymous object
+                TuningDatabaseInfo verifyObject = conn.QueryFirstOrDefault<TuningDatabaseInfo>(query, new
+                {
+                    id = inputNewVariant.CarBrand.Id,
+                });
+                if (verifyObject == null)
+                {
+                    string queryInsert = @"
+                             INSERT INTO [dbo].[TuningDatabaseInfo] (Id, Brand, Information)
+                                VALUES (@Id, @Brand, @Information)";
+                    CarBrand fullBrand = fetchCarBrandById(inputNewVariant.CarBrand.Id);
+                    conn.Execute(queryInsert, new
+                    {
+                        Id = inputNewVariant.CarBrand.Id,
+                        Brand = fullBrand.Name,
+                        Information = inputNewVariant.TypeName
+                    });
+                }
+            }
+        }
+
+        private CarBrand fetchCarBrandById(string ID)
+        {
+            string query = @"
+                          SELECT [Id]
+                            ,[Name]
+                            ,[Icon]
+                            ,[Slug]
+                          FROM [dbo].[CarBrand] Where Id=@id
+                        ";
+            using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("dbo")))
+            {
+                // Open the connection
+                conn.Open();
+
+                // Execute the query using Dapper's Execute method, passing in the parameters as an anonymous object
+                return conn.QueryFirstOrDefault<CarBrand>(query, new
+                {
+                    Id = int.Parse(ID.Split('_').First()),
+                });
+            }
+        }
         private void CreateNewTuningSpecialInfo(string newTuningVariantIdSpecial, string specialInfo, int ecuId)
         {
             // Define the SQL query for inserting a new record
