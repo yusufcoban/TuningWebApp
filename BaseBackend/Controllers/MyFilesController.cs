@@ -21,8 +21,11 @@ namespace BaseBackend.Controllers
 
         private readonly string _targetFilePath;
 
-        public MyFilesController()
+        private readonly MyUploadedFileHandler _fileHandler;
+
+        public MyFilesController(MyUploadedFileHandler fileHandler)
         {
+            _fileHandler = fileHandler;
             // Set the path where you want to save uploaded files
             _targetFilePath = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles");
 
@@ -66,6 +69,23 @@ namespace BaseBackend.Controllers
             {
                 await file.CopyToAsync(stream);
             }
+            
+            int index = solutionid.IndexOf("_", solutionid.IndexOf("_") + 1); // Find the second underscore
+            string result = solutionid.Substring(0, index);
+
+            MyUploadedFile uploadedFile = new MyUploadedFile()
+            {
+                FileName = fileName,
+                UploadDate = DateTime.UtcNow,
+                DTCList = string.Join(", ", dtcList),
+                Information = "",
+                Username = username,
+                SelectedVariants= string.Join(", ", solutions),
+                CarmodelId = result,
+                TuningVariantId= solutionid
+            };
+
+            _fileHandler.UpdateUploadedFileAsync(uploadedFile);
 
             // Handle the solutions array
             foreach (var solution in solutions)

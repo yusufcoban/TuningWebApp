@@ -99,6 +99,29 @@ namespace YourNamespace.Controllers
             }
         }
 
+
+
+        public string GenerateTuningVariant(InputNewVariant inputNewVariant)
+        {
+            // Generate a unique identifier for the tuning variant using the car brand's ID, e.g., "12_1"
+            string newTuningVariantId = getFreeTuningSpecialName(inputNewVariant.CarBrand.Id); // e.g., "12_1_1"
+            VerifyTuningDatabaseInfo(inputNewVariant);
+            // Insert a new record into the TuningVariant table with the provided details (e.g., "Golf4", "2000-2005", engine details)
+            CreateNewTuningVariant(newTuningVariantId, inputNewVariant.TypeName, $"{inputNewVariant.YearStart}-{inputNewVariant.YearEnd}", inputNewVariant.EngineName, inputNewVariant.EnginePowerKw.ToString(), inputNewVariant.FuelVariant);
+
+            // Insert a new record into the TuningSpecialInfo table, associating it with the selected ECU info and special details
+            CreateNewTuningSpecialInfo(newTuningVariantId, inputNewVariant.SpecialInfo, inputNewVariant.SelectedEcu.Id);
+
+            // Loop through the list of available solutions and insert each into the AvailableSolution table
+            foreach (var solution in inputNewVariant.AvailableSolutions)
+            {
+                CreateNewAvailableSolution(newTuningVariantId, solution.Name, solution.Information, solution.Value1, solution.Value2);
+            }
+
+            // Return the new TuningVariantId or a success message indicating the tuning variant has been created
+            return newTuningVariantId; // or return a confirmation message
+        }
+
         // Example of fetching AvailableSolutions (adjust based on your structure)
         private List<AvailableSolution> GetAvailableSolutionsByTuningId(string tuningId)
         {
@@ -136,28 +159,6 @@ namespace YourNamespace.Controllers
                 return result;
             }
         }
-
-        public string GenerateTuningVariant(InputNewVariant inputNewVariant)
-        {
-            // Generate a unique identifier for the tuning variant using the car brand's ID, e.g., "12_1"
-            string newTuningVariantId = getFreeTuningSpecialName(inputNewVariant.CarBrand.Id); // e.g., "12_1_1"
-            VerifyTuningDatabaseInfo(inputNewVariant);
-            // Insert a new record into the TuningVariant table with the provided details (e.g., "Golf4", "2000-2005", engine details)
-            CreateNewTuningVariant(newTuningVariantId, inputNewVariant.TypeName, $"{inputNewVariant.YearStart}-{inputNewVariant.YearEnd}", inputNewVariant.EngineName, inputNewVariant.EnginePowerKw.ToString(), inputNewVariant.FuelVariant);
-
-            // Insert a new record into the TuningSpecialInfo table, associating it with the selected ECU info and special details
-            CreateNewTuningSpecialInfo(newTuningVariantId, inputNewVariant.SpecialInfo, inputNewVariant.SelectedEcu.Id);
-
-            // Loop through the list of available solutions and insert each into the AvailableSolution table
-            foreach (var solution in inputNewVariant.AvailableSolutions)
-            {
-                CreateNewAvailableSolution(newTuningVariantId, solution.Name, solution.Information, solution.Value1, solution.Value2);
-            }
-
-            // Return the new TuningVariantId or a success message indicating the tuning variant has been created
-            return newTuningVariantId; // or return a confirmation message
-        }
-
         private void VerifyTuningDatabaseInfo(InputNewVariant inputNewVariant)
         {
             string query = @"
