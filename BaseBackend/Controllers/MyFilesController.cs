@@ -15,7 +15,9 @@ namespace BaseBackend.Controllers
         public IActionResult GetUploadedFiles()
         {
             // Generate a fake list of uploaded files
-            var uploadedFiles = GenerateFakeUploadedFiles(20);
+            var username = User.Identity.Name; // This gets the username
+            UserInformation currentUser = new UserInformation(username);
+            var uploadedFiles = _fileHandler.GetAllUploadedFilesAsyncByUserName(username);
             return Ok(uploadedFiles); // Return the list as JSON
         }
 
@@ -69,7 +71,7 @@ namespace BaseBackend.Controllers
             {
                 await file.CopyToAsync(stream);
             }
-            
+
             int index = solutionid.IndexOf("_", solutionid.IndexOf("_") + 1); // Find the second underscore
             string result = solutionid.Substring(0, index);
 
@@ -80,12 +82,15 @@ namespace BaseBackend.Controllers
                 DTCList = string.Join(", ", dtcList),
                 Information = "",
                 Username = username,
-                SelectedVariants= string.Join(", ", solutions),
+                SelectedVariants = string.Join(", ", solutions),
                 CarmodelId = result,
-                TuningVariantId= solutionid
+                TuningVariantId = solutionid,
+                State = 0,
+                ModifyDate = DateTime.UtcNow,
+                Title="test"
             };
 
-            _fileHandler.UpdateUploadedFileAsync(uploadedFile);
+            _fileHandler.AddUploadedFileAsync(uploadedFile);
 
             // Handle the solutions array
             foreach (var solution in solutions)
@@ -96,26 +101,5 @@ namespace BaseBackend.Controllers
             return Ok(new { Message = "File and solutions uploaded successfully." });
         }
 
-
-        private List<UploadedFile> GenerateFakeUploadedFiles(int count)
-        {
-            var files = new List<UploadedFile>();
-            var random = new Random();
-
-            for (int i = 1; i <= count; i++)
-            {
-                files.Add(new UploadedFile
-                {
-                    RequestID = i,
-                    CarModelId = random.Next(1, 100), // Random CarModelId
-                    UploadDate = DateTime.Now.AddDays(-random.Next(1, 30)), // Random upload date within the last 30 days
-                    LastModifiedDate = DateTime.Now.AddDays(-random.Next(0, 30)), // Random last modified date
-                    State = random.Next(1, 5), // Random state between 1 and 4
-                    Title = $"Car Model {random.Next(1, 100)} - Year {random.Next(2000, 2024)}" // Random title
-                });
-            }
-
-            return files;
-        }
     }
 }

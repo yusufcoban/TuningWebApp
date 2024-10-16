@@ -21,6 +21,8 @@ builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 
 // Register TuningDatabaseHandler for DI
 builder.Services.AddScoped<TuningDatabaseHandler>();
+builder.Services.AddScoped<MyUploadedFileHandler>();
+
 
 // Configure Authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

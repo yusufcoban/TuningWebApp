@@ -123,7 +123,7 @@
                 });
 
                 // Append solutionId to FormData
-                formData.append('solutionid', this.specialInfos?.tuning_id + '');
+                formData.append('solutionid', this.specialInfos?.tuningId + '');
 
                 // Assuming this.dtcList is a string like 'code1,code2;code3,code4'
                 // Assuming this.dtcList is a string that may be empty

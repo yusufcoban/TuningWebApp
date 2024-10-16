@@ -14,12 +14,12 @@
             </thead>
             <tbody>
                 <tr v-for="file in uploadedFiles" :key="file.requestID">
-                    <td>{{ file.requestID }}</td>
-                    <td>{{ file.carModelId }}</td>
+                    <td>{{ file.id }}</td>
+                    <td>{{ file.carmodelId }}</td>
                     <td>{{ formatDate(file.uploadDate) }}</td>
-                    <td>{{ formatDate(file.lastModifiedDate) }}</td>
+                    <td>{{ formatDate(file.modifyDate) }}</td>
                     <td>{{ file.state }}</td>
-                    <td>{{ file.title }}</td>
+                    <td>{{ file.fileName }}</td>
                 </tr>
             </tbody>
         </table>

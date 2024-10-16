@@ -11,13 +11,18 @@ public class MyUploadedFile
 
     [Required]
     public DateTime UploadDate { get; set; } = DateTime.Now;
+    public DateTime ModifyDate { get; set; }
+
+
+    
 
     [Required]
-    [StringLength(100)]
-    public string State { get; set; }
+    public int State { get; set; }
 
     [Required]
     public string TuningVariantId { get; set; }
+    public string Title { get; set; }
+
 
     public string DTCList { get; set; }
 

@@ -1,33 +1,31 @@
 ﻿using Dapper;
 
+using Microsoft.Extensions.Configuration;
+
 using System.Data;
 using System.Data.SqlClient;
 
 public class MyUploadedFileHandler
 {
-    private readonly string _connectionString;
+    private readonly IConfiguration _configuration;
+
 
     // Constructor to inject the connection string
-    public MyUploadedFileHandler(string connectionString)
+    public MyUploadedFileHandler(IConfiguration configuration)
     {
-        _connectionString = connectionString;
+        _configuration = configuration;
     }
 
-    // Method to open SQL connection
-    private IDbConnection CreateConnection()
-    {
-        return new SqlConnection(_connectionString);
-    }
 
     // CREATE: Add a new uploaded file record to the database
     public async Task<int> AddUploadedFileAsync(MyUploadedFile uploadedFile)
     {
         const string query = @"
-            INSERT INTO MyUploadedFiles (Username, UploadDate, State, TuningVariantId, DTCList, Information, SelectedVariants, CarmodelId,FileName)
-            VALUES (@Username, @UploadDate, @State, @TuningVariantId, @DTCList, @Information, @SelectedVariants, @CarmodelId,@FileName);
+            INSERT INTO MyUploadedFiles (Username, UploadDate, State, TuningVariantId, DTCList, Information, SelectedVariants, CarmodelId,FileName,ModifyDate,Title)
+            VALUES (@Username, @UploadDate, @State, @TuningVariantId, @DTCList, @Information, @SelectedVariants, @CarmodelId,@FileName,@ModifyDate,@Title);
             SELECT CAST(SCOPE_IDENTITY() as int);";
 
-        using (var connection = CreateConnection())
+        using (var connection = new SqlConnection(_configuration.GetConnectionString("dbo")))
         {
             connection.Open();
             var result = await connection.QuerySingleAsync<int>(query, new
@@ -40,7 +38,9 @@ public class MyUploadedFileHandler
                 uploadedFile.Information,
                 uploadedFile.SelectedVariants,
                 uploadedFile.CarmodelId,
-                uploadedFile.FileName
+                uploadedFile.FileName,
+                uploadedFile.Title,
+                uploadedFile.ModifyDate
 
             });
 
@@ -53,7 +53,7 @@ public class MyUploadedFileHandler
     {
         const string query = "SELECT * FROM MyUploadedFiles WHERE Id = @Id";
 
-        using (var connection = CreateConnection())
+        using (var connection = new SqlConnection(_configuration.GetConnectionString("dbo")))
         {
             connection.Open();
             var uploadedFile = await connection.QuerySingleOrDefaultAsync<MyUploadedFile>(query, new { Id = id });
@@ -66,7 +66,7 @@ public class MyUploadedFileHandler
     {
         const string query = "SELECT * FROM MyUploadedFiles";
 
-        using (var connection = CreateConnection())
+        using (var connection = new SqlConnection(_configuration.GetConnectionString("dbo")))
         {
             connection.Open();
             var uploadedFiles = await connection.QueryAsync<MyUploadedFile>(query);
@@ -88,10 +88,12 @@ public class MyUploadedFileHandler
                 Information = @Information,
                 SelectedVariants = @SelectedVariants,
                 CarmodelId = @CarmodelId,
-                FileName=@FileName
+                FileName=@FileName,
+                ModifyDate=@ModifyDate,
+Title=@Title
             WHERE Id = @Id";
 
-        using (var connection = CreateConnection())
+        using (var connection = new SqlConnection(_configuration.GetConnectionString("dbo")))
         {
             connection.Open();
             var rowsAffected = await connection.ExecuteAsync(query, new
@@ -105,7 +107,9 @@ public class MyUploadedFileHandler
                 uploadedFile.SelectedVariants,
                 uploadedFile.CarmodelId,
                 uploadedFile.Id,
-                uploadedFile.FileName
+                uploadedFile.FileName,
+                uploadedFile.ModifyDate,
+                uploadedFile.Title
             });
 
             return rowsAffected > 0; // Return true if the update was successful
@@ -117,11 +121,23 @@ public class MyUploadedFileHandler
     {
         const string query = "DELETE FROM MyUploadedFiles WHERE Id = @Id";
 
-        using (var connection = CreateConnection())
+        using (var connection = new SqlConnection(_configuration.GetConnectionString("dbo")))
         {
             connection.Open();
             var rowsAffected = await connection.ExecuteAsync(query, new { Id = id });
             return rowsAffected > 0; // Return true if the delete was successful
+        }
+    }
+
+    public IEnumerable<MyUploadedFile> GetAllUploadedFilesAsyncByUserName(string username)
+    {
+        const string query = "SELECT * FROM MyUploadedFiles where username=@username";
+
+        using (var connection = new SqlConnection(_configuration.GetConnectionString("dbo")))
+        {
+            connection.Open();
+            var uploadedFiles = connection.Query<MyUploadedFile>(query, new { username });
+            return uploadedFiles;
         }
     }
 }
