@@ -6,5 +6,5 @@ export const imagelogosolutions = [
     { name: "stage2", logo: "../src/assets/solutionslogos/stage2.png", inputArea: false },
     { name: "adblue", logo: "../src/assets/solutionslogos/adblue.png", inputArea: false },
     { name: "flaps", logo: "../src/assets/solutionslogos/flaps.png", inputArea: false },
-    { name: "Dtc", logo: "../src/assets/solutionslogos/dtc.png", inputArea: true, inputAreaText: 'Please enter Dtcs with comma separator' }
+    { name: "dtc", logo: "../src/assets/solutionslogos/dtc.png", inputArea: true, inputAreaText: 'Please enter Dtcs with comma separator' }
 ];

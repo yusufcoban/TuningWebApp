@@ -70,6 +70,13 @@
                 this.$router.push('/login'); // Redirect to login page
             },
         },
+        mounted() {
+            // Fetch the ECU list when the component is mounted
+            this.$store.dispatch('fetchEcuList')
+                .catch(error => {
+                    console.error('Error fetching ECU list:', error);
+                });
+        },
     };
 </script>
 

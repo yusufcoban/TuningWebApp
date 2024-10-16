@@ -361,13 +361,12 @@
                     availableSolutions: []
                 },
                 checkableItems: [
-                    { id: 'egr', label: 'EGR', checked: false, showValues: false, value1: 0, value2: 0 },
-                    { id: 'agr', label: 'AGR', checked: false, showValues: false, value1: 0, value2: 0 },
-                    { id: 'adblue', label: 'AdBlue', checked: false, showValues: false, value1: 0, value2: 0 },
-                    { id: 'stage1', label: 'Stage 1', checked: false, showValues: true, value1: 0, value2: 0, textValue1: 'Enter increase in kW', textValue2: 'Enter increase in NM' },
-                    { id: 'stage2', label: 'Stage 2', checked: false, showValues: true, value1: 0, value2: 0, textValue1: 'Enter increase in kW', textValue2: 'Enter increase in NM' },
-                    { id: 'dtc', label: 'DTC', checked: false, showValues: false, value1: 0, value2: 0 },
-                    { id: 'flaps', label: 'Flaps', checked: false, showValues: false, value1: 0, value2: 0 },
+                    { id: 'egr', label: 'egr', checked: false, showValues: false, value1: 0, value2: 0 },
+                    { id: 'adblue', label: 'adblue', checked: false, showValues: false, value1: 0, value2: 0 },
+                    { id: 'stage1', label: 'stage1', checked: false, showValues: true, value1: 0, value2: 0, textValue1: 'Enter increase in kW', textValue2: 'Enter increase in NM' },
+                    { id: 'stage2', label: 'stage2', checked: false, showValues: true, value1: 0, value2: 0, textValue1: 'Enter increase in kW', textValue2: 'Enter increase in NM' },
+                    { id: 'dtc', label: 'dtc', checked: false, showValues: false, value1: 0, value2: 0 },
+                    { id: 'flaps', label: 'flaps', checked: false, showValues: false, value1: 0, value2: 0 },
                 ],
                 ecuList: [
                     { Id: 1, EcuName: "MED17.7", ConnectionInfoId: 12 },

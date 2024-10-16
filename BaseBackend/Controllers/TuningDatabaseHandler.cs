@@ -325,6 +325,23 @@ namespace YourNamespace.Controllers
                 return carBrandId + "_1";
             }
         }
+
+        public List<EcuInfo> GetEcuList()
+        {
+            // Fetch like `1_2_X` from [TuningSpecialInfo] if available, if not return `1_2_1`.
+            // If available, split the string by `_` and increase the last part by 1 and return.
+            using (var con = new SqlConnection(_configuration.GetConnectionString("dbo")))
+            {
+                con.Open();
+                // Modify the query to search for all entries starting with the carBrandId (e.g., "1_2%")
+                string query = "SELECT * FROM [dbo].[EcuInfo]";
+                List<EcuInfo> result = con.Query<EcuInfo>(query).ToList();
+
+                return result;
+            }
+        }
+
+      
     }
 
 }

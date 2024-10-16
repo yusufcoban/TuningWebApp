@@ -40,14 +40,14 @@
             ...mapGetters(['isAuthenticated']), // Map isAuthenticated getter to this component
         },
         mounted() {
-            // Check if the user is already authenticated
             if (this.isAuthenticated) {
                 this.$router.push('/home'); // Redirect to home if already logged in
+            } else {
+                this.$router.push('/login'); 
             }
         },
         methods: {
             ...mapMutations(['login']),
-
             async handleLogin() {
                 const apiUrl = import.meta.env.VITE_API_BASE_URL;
 

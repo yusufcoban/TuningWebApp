@@ -44,6 +44,12 @@ namespace YourNamespace.Controllers
             return Ok(_tuningDatabaseHandler.getTuningSpecialInfoByTuningId(id));
         }
 
+        [HttpGet("tuningecuListFull")]
+        public ActionResult<TuningSpecialInfo> GetEcuList()
+        {
+            return Ok(_tuningDatabaseHandler.GetEcuList());
+        }
+
         [HttpPost("GenerateTuningVariant")]
         public ActionResult<TuningSpecialInfo> GenerateTuningVariant(InputNewVariant inputNewVariant)
         {

@@ -5,6 +5,7 @@ const store = createStore({
         return {
             user: JSON.parse(localStorage.getItem('user')) || null, // Initialize user from local storage
             isAdmin: false, // Add an isAdmin state
+            ecuListGeneral: [],
         };
     },
     mutations: {
@@ -17,6 +18,9 @@ const store = createStore({
             state.user = null; // Clear user data on logout
             state.isAdmin = false; // Reset isAdmin
             localStorage.removeItem('user'); // Remove user data from local storage
+        },
+        setEcuList(state, ecuList) {
+            state.ecuListGeneral = ecuList; // Set the ECU list
         },
     },
     actions: {
@@ -39,6 +43,20 @@ const store = createStore({
         logout({ commit }) {
             commit('logout'); // Clear user data on logout
         },
+        async fetchEcuList({ commit }) {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/Tuning/tuningecuListFull`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include', // Include credentials for cookie-based auth
+            });
+
+            if (response.ok) {
+                const ecuList = await response.json();
+                commit('setEcuList', ecuList); // Commit the ECU list
+            } else {
+                throw new Error('Failed to fetch ECU list');
+            }
+        },
     },
     getters: {
         isAuthenticated(state) {
@@ -49,6 +67,9 @@ const store = createStore({
         },
         isAdmin(state) {
             return state.isAdmin; // Return the isAdmin state
+        },
+        ecuListGeneral(state) {
+            return state.ecuListGeneral; // Return the ECU list
         },
     },
 });

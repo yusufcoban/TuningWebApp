@@ -1,8 +1,8 @@
 <template>
     <div class="uploaded-files">
         <h1>Uploaded Files</h1>
-        <table>
-            <thead>
+        <table class="table table-hover table-bordered">
+            <thead class="table-light">
                 <tr>
                     <th>Request ID</th>
                     <th>Car Model ID</th>
@@ -13,7 +13,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="file in uploadedFiles" :key="file.requestID">
+                <tr v-for="file in uploadedFiles" :key="file.id" class="row-clickable">
                     <td>{{ file.id }}</td>
                     <td>{{ file.carmodelId }}</td>
                     <td>{{ formatDate(file.uploadDate) }}</td>
