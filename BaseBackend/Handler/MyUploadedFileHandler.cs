@@ -43,7 +43,7 @@ public class MyUploadedFileHandler
                 uploadedFile.ModifyDate
 
             });
-
+            CreateTaskAsync(result);
             return result; // Returns the newly created record's ID
         }
     }
@@ -140,4 +140,81 @@ Title=@Title
             return uploadedFiles;
         }
     }
+
+
+    // Admin area
+
+    // Admin Functions
+
+    // 1. CREATE: Add a new Task with a null filename (linked to MyUploadedFiles)
+    public async Task<int> CreateTaskAsync(int uploadedFileId)
+    {
+        const string query = @"
+            INSERT INTO Task (MyUploadedFileId, NewFileName, CreateDate)
+            VALUES (@MyUploadedFileId, NULL, GETDATE());
+            SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        using (var connection = new SqlConnection(_configuration.GetConnectionString("dbo")))
+        {
+            connection.Open();
+            var result = await connection.QuerySingleAsync<int>(query, new { MyUploadedFileId = uploadedFileId });
+            return result; // Returns the newly created Task ID
+        }
+    }
+
+    // 2. READ: Get all open tasks (where NewFileName is NULL)
+    public async Task<IEnumerable<Task>> GetOpenTasksAsync()
+    {
+        const string query = "SELECT * FROM Task WHERE NewFileName IS NULL";
+
+        using (var connection = new SqlConnection(_configuration.GetConnectionString("dbo")))
+        {
+            connection.Open();
+            var tasks = await connection.QueryAsync<Task>(query);
+            return tasks;
+        }
+    }
+
+    // 3. UPDATE: Upload file and set NewFileName, and update the State of MyUploadedFiles
+    public async Task<bool> CompleteTaskAsync(int taskId, string newFileName, int newState)
+    {
+        using (var connection = new SqlConnection(_configuration.GetConnectionString("dbo")))
+        {
+            connection.Open();
+            using (var transaction = connection.BeginTransaction())
+            {
+                try
+                {
+                    // Update the Task with the new filename
+                    const string updateTaskQuery = "UPDATE Task SET NewFileName = @NewFileName WHERE TaskId = @TaskId";
+                    var taskUpdated = await connection.ExecuteAsync(updateTaskQuery, new { NewFileName = newFileName, TaskId = taskId }, transaction);
+
+                    // Update the related MyUploadedFile with the new state
+                    const string updateFileQuery = @"
+                        UPDATE MyUploadedFiles
+                        SET State = @NewState, ModifyDate = GETDATE()
+                        WHERE Id = (SELECT MyUploadedFileId FROM Task WHERE TaskId = @TaskId)";
+                    var fileUpdated = await connection.ExecuteAsync(updateFileQuery, new { NewState = newState, TaskId = taskId }, transaction);
+
+                    // Commit the transaction if both updates succeed
+                    if (taskUpdated > 0 && fileUpdated > 0)
+                    {
+                        transaction.Commit();
+                        return true;
+                    }
+
+                    transaction.Rollback();
+                    return false;
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+        }
+    }
+
+
+
 }
