@@ -45,14 +45,6 @@
             </div>
         </div>
 
-        <span v-if="isAdmin && !selectedModel && selectedMake!=null" class="plus-icon" title="Add New Model">
-            <span @click="" class="plus-icon" title="Add New Model" data-bs-toggle="modal" data-bs-target="#addModelModal">
-                <button class="btn btn-primary mt-4">
-                    <font-awesome-icon icon="plus" /> New Model(not implemented)
-                </button>
-            </span>
-            <br />
-        </span>
         <span v-if="isAdmin && preselectedModelId!=null && !selectedModel" class="plus-icon" title="Add New Model">
             <span @click="openModal(preselectedModelId)" class="plus-icon" title="Add New Model" data-bs-toggle="modal" data-bs-target="#addModelModal">
                 <button class="btn btn-primary mt-4">

@@ -5,7 +5,7 @@ import Home from '@/components/Home.vue'; // Home component
 import { useStore } from 'vuex'; // Vuex store
 import App from './App.vue'; // Main layout
 import MyFiles from '@/components/MyFiles.vue'; // Main layout
-
+import MyFilesViewer from '@/components/MyFilesViewer.vue';
 import AutoDatabase from './components/AutoDatabase.vue'; // Dashboard component
 
 // Define your routes
@@ -33,7 +33,13 @@ const routes = [
         path: '/home',
         meta: { requiresAuth: true }, // Ensure this route requires authentication,
         component: Home
-    }
+    },
+    {
+        path: '/MyFilesViewer/:id',
+        meta: { requiresAuth: true }, // Ensure this route requires authentication,
+        component: MyFilesViewer
+    },
+    
 ];
 
 // Create the router instance

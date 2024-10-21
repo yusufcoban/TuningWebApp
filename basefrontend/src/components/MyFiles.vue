@@ -13,13 +13,16 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="file in uploadedFiles" :key="file.id" class="row-clickable">
+                <tr v-for="file in uploadedFiles" :key="file.id" class="row-clickable" @click="this.$router.push({ path: `/MyFilesViewer/`+file.id });">
                     <td>{{ file.id }}</td>
                     <td>{{ file.carmodelId }}</td>
                     <td>{{ formatDate(file.uploadDate) }}</td>
                     <td>{{ formatDate(file.modifyDate) }}</td>
                     <td>{{ file.state }}</td>
-                    <td>{{ file.fileName }}</td>
+                    <td>{{ file.fileName }}
+                    <span @click="downloadFile(fileName)">
+                          </span></td>
+
                 </tr>
             </tbody>
         </table>
@@ -36,10 +39,43 @@
                 errorMessage: '', // To store error messages if any
             };
         },
+        coponent() {
+        },
         mounted() {
             this.fetchUploadedFiles(); // Fetch uploaded files on component mount
         },
         methods: {
+            async downloadFile(fileName) {
+                try {
+                    const apiUrl = import.meta.env.VITE_API_BASE_URL;
+                    const response = await fetch(`${apiUrl}/api/MyFiles/download/${fileName}`, {
+                        method: 'GET',
+                        credentials: 'include' // Ensure cookies are sent with the request
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to download the file');
+                    }
+
+                    // Create a Blob from the response data
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+
+                    // Create a link element to initiate the download
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = fileName; // Specify the file name for download
+                    document.body.appendChild(a); // Append to the DOM
+                    a.click(); // Trigger the download
+                    a.remove(); // Clean up
+
+                    // Release the URL object
+                    window.URL.revokeObjectURL(url);
+                } catch (error) {
+                    console.error('Error downloading the file:', error);
+                    this.errorMessage = 'Could not download the file. Please try again later.';
+                }
+            },
             async fetchUploadedFiles() {
                 try {
                     const apiUrl = import.meta.env.VITE_API_BASE_URL;

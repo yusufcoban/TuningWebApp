@@ -21,6 +21,25 @@ namespace BaseBackend.Controllers
             return Ok(uploadedFiles); // Return the list as JSON
         }
 
+        [HttpGet("GetUploadedFilesByID")]
+        public IActionResult GetUploadedFilesByID(int id)
+        {
+            // Generate a fake list of uploaded files
+            var username = User.Identity.Name; // This gets the username
+            UserInformation currentUser = new UserInformation(username);
+            var uploadedFiles = _fileHandler.GetAllUploadedFilesAsyncByUserName(username);
+            bool isValidRequest = uploadedFiles.Any() && uploadedFiles.Where(x => x.Id == id).Any();
+            if (isValidRequest)
+            {
+                return Ok(uploadedFiles.Where(x => x.Id == id)); // Return the list as JSON
+            }
+            else
+            {
+                return BadRequest();
+            }
+
+        }
+
         private readonly string _targetFilePath;
 
         private readonly MyUploadedFileHandler _fileHandler;
@@ -38,17 +57,37 @@ namespace BaseBackend.Controllers
             }
         }
 
+
+        [HttpGet("download/{fileName}")]
+        public IActionResult DownloadFile(string fileName)
+        {
+
+            // Create the full file path (including the username as a subfolder under UploadedFiles)
+            var filePath = fetchCurrentPathName(fileName);
+            if (!System.IO.File.Exists(filePath))
+            {
+                return NotFound(); // Return 404 if the file does not exist
+            }
+
+            // Return the file as a downloadable file
+            var fileBytes = System.IO.File.ReadAllBytes(filePath);
+            return File(fileBytes, "application/octet-stream", fileName);
+        }
+
         // POST api/fileupload
         [HttpPost("upload")]
         public async Task<IActionResult> UploadFile(IFormFile file, [FromForm] string[] solutions, [FromForm] string solutionid, [FromForm] string[] dtcList)
         {
+
+            var username = User.Identity.Name; // This gets the username
+            UserInformation currentUser = new UserInformation(username);
+
+
+
             if (file == null || file.Length == 0)
             {
                 return BadRequest("No file uploaded.");
             }
-
-            var username = User.Identity.Name; // This gets the username
-            UserInformation currentUser = new UserInformation(username);
 
             // Handle the uploaded file
             // Get the file extension
@@ -87,7 +126,7 @@ namespace BaseBackend.Controllers
                 TuningVariantId = solutionid,
                 State = 0,
                 ModifyDate = DateTime.UtcNow,
-                Title="test"
+                Title = "test"
             };
 
             _fileHandler.AddUploadedFileAsync(uploadedFile);
@@ -99,6 +138,17 @@ namespace BaseBackend.Controllers
             }
 
             return Ok(new { Message = "File and solutions uploaded successfully." });
+        }
+
+        private string fetchCurrentPathName(string filename)
+        {
+            var username = User.Identity.Name; // This gets the username
+            UserInformation currentUser = new UserInformation(username);
+            // Create the full file path (including the username as a subfolder under UploadedFiles)
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles", username, filename);
+
+            return filePath;
+
         }
 
     }
