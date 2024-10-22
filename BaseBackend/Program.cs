@@ -22,6 +22,9 @@ builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 // Register TuningDatabaseHandler for DI
 builder.Services.AddScoped<TuningDatabaseHandler>();
 builder.Services.AddScoped<MyUploadedFileHandler>();
+builder.Services.AddScoped<StringReplacementHandler>();
+
+
 builder.Services.AddScoped<EcuHandler>();
 
 

@@ -13,10 +13,13 @@ namespace BaseBackend.Controllers
     public class BaseController : ControllerBase
     {
         private readonly EcuHandler _ecuHandler;
+        private readonly StringReplacementHandler _stringReplacementHandler;
 
-        public BaseController(EcuHandler ecuHandler)
+
+        public BaseController(EcuHandler ecuHandler, StringReplacementHandler stringReplacementHandler)
         {
             this._ecuHandler = ecuHandler;
+            this._stringReplacementHandler = stringReplacementHandler;
         }
 
         // GET: apimyfiles
@@ -25,6 +28,17 @@ namespace BaseBackend.Controllers
         {
             return Ok(_ecuHandler.GetAllEcus()); // Return the list as JSON
         }
+
+
+        [HttpGet("TestReplaceMentFunctions")]
+        public IActionResult TestFucntion1()
+        {
+           var testPath= Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles\\user\\bmwx6HW07616431SW07628500.org");
+            _stringReplacementHandler.ReplaceStringsInFile(testPath, ["egr"], "5_1_4");
+
+            return Ok(_ecuHandler.GetAllEcus()); // Return the list as JSON
+        }
+
 
     }
 }
