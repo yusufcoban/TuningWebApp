@@ -163,14 +163,26 @@ Title=@Title
     }
 
     // 2. READ: Get all open tasks (where NewFileName is NULL)
-    public async Task<IEnumerable<Task>> GetOpenTasksAsync()
+    public async Task<IEnumerable<BaseBackend.Models.Task>> GetOpenTasksAsyncInNullState()
     {
-        const string query = "SELECT * FROM Task WHERE NewFileName IS NULL";
+        const string query = "SELECT * FROM Task left join MyUploadedFiles on [MyUploadedFileId]=MyUploadedFiles.Id\r\n  where MyUploadedFiles.State < 5 AND NewFileName IS NULL";
 
         using (var connection = new SqlConnection(_configuration.GetConnectionString("dbo")))
         {
             connection.Open();
-            var tasks = await connection.QueryAsync<Task>(query);
+            var tasks = await connection.QueryAsync<BaseBackend.Models.Task>(query);
+            return tasks;
+        }
+    }
+
+    public async Task<IEnumerable<BaseBackend.Models.Task>> GetAllOpenTasksAsync()
+    {
+        const string query = "SELECT *\r\n  FROM [Task]\r\n  left join MyUploadedFiles on [MyUploadedFileId]=MyUploadedFiles.Id\r\n  where MyUploadedFiles.State < 5";
+
+        using (var connection = new SqlConnection(_configuration.GetConnectionString("dbo")))
+        {
+            connection.Open();
+            var tasks = await connection.QueryAsync<BaseBackend.Models.Task>(query);
             return tasks;
         }
     }

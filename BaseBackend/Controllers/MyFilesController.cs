@@ -21,6 +21,20 @@ namespace BaseBackend.Controllers
             return Ok(uploadedFiles); // Return the list as JSON
         }
 
+        [HttpGet("GetOpenTasksForAutomation")]
+        public async Task<IActionResult> GetOpenTasks()
+        {
+            var result = await _fileHandler.GetOpenTasksAsyncInNullState();
+            return Ok(result);
+        }
+
+        [HttpGet("GetAllTasks")]
+        public async Task<IActionResult> GetAllTasks()
+        {
+            var result = await _fileHandler.GetAllOpenTasksAsync();
+            return Ok(result);// Return the list as JSON
+        }
+
         [HttpGet("GetUploadedFilesByID")]
         public IActionResult GetUploadedFilesByID(int id)
         {
