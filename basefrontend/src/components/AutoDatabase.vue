@@ -156,8 +156,8 @@
                                         <label for="ecuSelect">Select ECU</label>
                                         <select id="ecuSelect" v-model="formData.selectedEcu.id" class="form-control" required>
                                             <option value="" disabled>Select ECU</option>
-                                            <option v-for="ecu in ecuList" :key="ecu.Id" :value="ecu.Id">
-                                                {{ ecu.EcuName }}
+                                            <option v-for="ecu in ecuList" :key="ecu.id" :value="ecu.id">
+                                                {{ ecu.ecuName }}
                                             </option>
                                         </select>
                                     </div>
@@ -261,7 +261,7 @@
                                         <select id="ecuSelect" v-model="formData.selectedEcu.id" class="form-control" required>
                                             <option value="" disabled>Select ECU</option>
                                             <option v-for="ecu in ecuList" :key="ecu.Id" :value="ecu.Id">
-                                                {{ ecu.EcuName }}
+                                                {{ ecu.ecuName }}
                                             </option>
                                         </select>
                                     </div>
@@ -372,6 +372,7 @@
             Modal
         }, mounted() {
             this.fetchCarBrands(); // Call fetch method on mount
+            this.getEcuListBackend();
         },
         computed: {
             ...mapState(['user']),
@@ -404,6 +405,35 @@
             }
         },
         methods: {
+            async getEcuListBackend() {
+                this.ecuList = [];
+                const apiUrl = import.meta.env.VITE_API_BASE_URL; // Get base URL from environment variables
+                this.isLoading = true; // Set loading to true while fetching data
+
+                try {
+                    const response = await fetch(`${apiUrl}/api/Base/GetEcuList`, {
+                        method: 'GET', // Specify the method
+                        credentials: 'include', // Include credentials such as cookies
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`); // Handle HTTP errors
+                    }
+
+                    const data = await response.json();
+                    this.ecuList = data; // Store fetched tuning info
+                    // Group tuning info by type and include tuningId in each variant
+                   
+
+                } catch (error) {
+                    console.error('Error fetching tuning data:', error); // Log the error for debugging
+                    // You can also set an error state here to inform the user
+                } finally {
+                    this.isLoading = false; // Set loading to false after the request
+                }
+
+
+            },
             updateAvailableSolutions() {
                 // Clear existing available solutions
                 this.formData.availableSolutions = [];
