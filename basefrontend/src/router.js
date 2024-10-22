@@ -5,6 +5,8 @@ import Home from '@/components/Home.vue'; // Home component
 import { useStore } from 'vuex'; // Vuex store
 import App from './App.vue'; // Main layout
 import MyFiles from '@/components/MyFiles.vue'; // Main layout
+import OpenTasks from '@/components/OpenTasks.vue'; // Admin task overview
+
 import MyFilesViewer from '@/components/MyFilesViewer.vue';
 import AutoDatabase from './components/AutoDatabase.vue'; // Dashboard component
 
@@ -19,6 +21,11 @@ const routes = [
         path: '/UploadFile',
         component: AutoDatabase,
         meta: { requiresAuth: true }, // This route requires authentication
+    },
+    {
+        path: '/openTasks',
+        meta: { requiresAuth: true }, // This route requires authentication
+        component: OpenTasks
     },
     {
         path: '/myfiles',

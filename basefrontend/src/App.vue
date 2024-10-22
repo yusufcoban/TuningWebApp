@@ -20,7 +20,7 @@
 
 
             <ul class="menu list-unstyled">
-                <li class="sidebar-item" >
+                <li class="sidebar-item">
                     <router-link to="/UploadFile" class="sidebar-link">
                         <i class="bi bi-grid-fill"></i>
                         Upload File
@@ -30,6 +30,12 @@
                     <router-link to="/myfiles" class="sidebar-link">
                         <i class="bi bi-cash"></i>
                         My Files
+                    </router-link>
+                </li>
+                <li class="sidebar-item" v-if="isAdmin">
+                    <router-link to="/openTasks" class="sidebar-link">
+                        <i class="bi bi-cash"></i>
+                        Open Tasks
                     </router-link>
                 </li>
             </ul>

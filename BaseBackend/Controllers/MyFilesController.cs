@@ -88,6 +88,23 @@ namespace BaseBackend.Controllers
             return File(fileBytes, "application/octet-stream", fileName);
         }
 
+        [HttpGet("downloadAdmin/{fileName}")]
+        public async Task<IActionResult> DownloadFileAdmin(string fileName, [FromQuery] string userName)
+        {
+
+            // Create the full file path (including the username as a subfolder under UploadedFiles)
+            var filePath = fetchCurrentPathName(fileName, userName);
+            if (!System.IO.File.Exists(filePath))
+            {
+                return NotFound(); // Return 404 if the file does not exist
+            }
+
+            // Return the file as a downloadable file
+            var fileBytes = System.IO.File.ReadAllBytes(filePath);
+            return File(fileBytes, "application/octet-stream", fileName);
+        }
+
+
         // POST api/fileupload
         [HttpPost("upload")]
         public async Task<IActionResult> UploadFile(IFormFile file, [FromForm] string[] solutions, [FromForm] string solutionid, [FromForm] string[] dtcList)
@@ -154,10 +171,15 @@ namespace BaseBackend.Controllers
             return Ok(new { Message = "File and solutions uploaded successfully." });
         }
 
-        private string fetchCurrentPathName(string filename)
+        private string fetchCurrentPathName(string filename,string userName="")
         {
-            var username = User.Identity.Name; // This gets the username
-            UserInformation currentUser = new UserInformation(username);
+            var username = userName;
+            if (string.IsNullOrEmpty(userName))
+            {
+                username = User.Identity.Name; // This gets the username
+                UserInformation currentUser = new UserInformation(username);
+            }
+          
             // Create the full file path (including the username as a subfolder under UploadedFiles)
             var filePath = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles", username, filename);
 

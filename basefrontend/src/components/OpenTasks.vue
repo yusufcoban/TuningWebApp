@@ -4,28 +4,24 @@
         <table class="table table-hover table-bordered">
             <thead class="table-light">
                 <tr>
-                    <th>Request ID</th>
-                    <th>Car Model ID</th>
-                    <th>Upload Date</th>
-                    <th>Last Modified Date</th>
-                    <th>State</th>
-                    <th>Title</th>
+                    <th>taskId ID</th>
+                    <th>createDate</th>
+                    <th>tuningVariantId</th>
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="file in uploadedFiles" :key="file.id" class="row-clickable" @click="this.$router.push({ path: `/MyFilesViewer/`+file.id });">
-                    <td>{{ file.id }}</td>
-                    <td>{{ file.carmodelId }}</td>
-                    <td>{{ formatDate(file.uploadDate) }}</td>
-                    <td>{{ formatDate(file.modifyDate) }}</td>
-                    <td>{{ file.state }}</td>
-                    <td>{{ file.fileName }}
-              </td>
+                <tr v-for="file in openTasks" :key="file.id" class="row-clickable"   >
+                    <td>{{ file.taskId }}</td>
+                    <td>{{ formatDate(file.createDate) }}</td>
+                    <td>{{ file.myUploadedFile.tuningVariantId }}</td>
+                    <td>
+                    <button @click="downloadFile(file.myUploadedFile.fileName,file.myUploadedFile.username)">Download uploaded file
+                    </button></td>
 
                 </tr>
             </tbody>
         </table>
-        <p v-if="uploadedFiles.length === 0">No files uploaded yet.</p>
+        <p v-if="openTasks.length === 0">No files uploaded yet.</p>
         <p v-if="errorMessage">{{ errorMessage }}</p>
     </div>
 </template>
@@ -34,20 +30,22 @@
     export default {
         data() {
             return {
-                uploadedFiles: [], // Array to hold uploaded files
+                openTasks: [], // Array to hold uploaded files
                 errorMessage: '', // To store error messages if any
             };
         },
         coponent() {
         },
         mounted() {
-            this.fetchUploadedFiles(); // Fetch uploaded files on component mount
+            this.fetchopenTasks(); // Fetch uploaded files on component mount
         },
         methods: {
-            async downloadFile(fileName) {
+            async downloadFile(fileName, userName) {
                 try {
                     const apiUrl = import.meta.env.VITE_API_BASE_URL;
-                    const response = await fetch(`${apiUrl}/api/MyFiles/download/${fileName}`, {
+
+                    // Modify the fetch URL to include the userName as a query parameter
+                    const response = await fetch(`${apiUrl}/api/MyFiles/downloadAdmin/${fileName}?userName=${encodeURIComponent(userName)}`, {
                         method: 'GET',
                         credentials: 'include' // Ensure cookies are sent with the request
                     });
@@ -75,13 +73,13 @@
                     this.errorMessage = 'Could not download the file. Please try again later.';
                 }
             },
-            async fetchUploadedFiles() {
+            async fetchopenTasks() {
                 try {
                     const apiUrl = import.meta.env.VITE_API_BASE_URL;
-                    const response = await fetch(`${apiUrl}/api/MyFiles`, {
+                    const response = await fetch(`${apiUrl}/api/MyFiles/GetAllTasks`, {
                         method: 'GET',
                         credentials: 'include', // This ensures cookies are sent with the request
-                      
+
                     });
 
                     if (!response.ok) {
@@ -89,7 +87,7 @@
                     }
 
                     const data = await response.json();
-                    this.uploadedFiles = data;
+                    this.openTasks = data;
                 } catch (error) {
                     console.error('Error fetching uploaded files:', error);
                     this.errorMessage = 'Could not load files. Please try again later.';

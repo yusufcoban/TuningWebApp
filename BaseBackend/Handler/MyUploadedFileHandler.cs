@@ -177,12 +177,27 @@ Title=@Title
 
     public async Task<IEnumerable<BaseBackend.Models.Task>> GetAllOpenTasksAsync()
     {
-        const string query = "SELECT *\r\n  FROM [Task]\r\n  left join MyUploadedFiles on [MyUploadedFileId]=MyUploadedFiles.Id\r\n  where MyUploadedFiles.State < 5";
+        const string query = @"
+        SELECT t.*, f.* 
+        FROM [Task] t
+        LEFT JOIN MyUploadedFiles f ON t.MyUploadedFileId = f.Id
+        WHERE f.State < 5";
 
         using (var connection = new SqlConnection(_configuration.GetConnectionString("dbo")))
         {
             connection.Open();
-            var tasks = await connection.QueryAsync<BaseBackend.Models.Task>(query);
+
+            // Multi-mapping with Dapper to map Task and MyUploadedFile
+            var tasks = await connection.QueryAsync<BaseBackend.Models.Task, MyUploadedFile, BaseBackend.Models.Task>(
+                query,
+                (task, file) =>
+                {
+                    task.MyUploadedFile = file;
+                    return task;
+                },
+                splitOn: "Id" // The column where Dapper should start splitting the result set
+            );
+
             return tasks;
         }
     }
