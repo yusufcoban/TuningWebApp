@@ -74,7 +74,29 @@ public class MyUploadedFileHandler
         }
     }
 
-    // UPDATE: Update an existing uploaded file
+    // UPDATE: Update state of uploaded file
+    public async Task<bool> UpdateUploadedFileStateAsync(int id, int newState)
+    {
+        const string query = @"
+            UPDATE MyUploadedFiles
+            SET 
+                State = @State,
+                ModifyDate=GetDate()
+            WHERE Id = @Id";
+
+        using (var connection = new SqlConnection(_configuration.GetConnectionString("dbo")))
+        {
+            connection.Open();
+            var rowsAffected = await connection.ExecuteAsync(query, new
+            {
+                Id = id,
+                State = newState
+            });
+
+            return rowsAffected > 0; // Return true if the update was successful
+        }
+    }
+   
     public async Task<bool> UpdateUploadedFileAsync(MyUploadedFile uploadedFile)
     {
         const string query = @"
@@ -175,13 +197,13 @@ Title=@Title
         }
     }
 
-    public async Task<IEnumerable<BaseBackend.Models.Task>> GetAllOpenTasksAsync()
+    public async Task<IEnumerable<BaseBackend.Models.Task>> GetAllOpenTasksAsync(int maxState = 4, int minState = 0)
     {
         const string query = @"
         SELECT t.*, f.* 
         FROM [Task] t
         LEFT JOIN MyUploadedFiles f ON t.MyUploadedFileId = f.Id
-        WHERE f.State < 5";
+        WHERE f.State < @stateInput and  f.State > @stateMinInput";
 
         using (var connection = new SqlConnection(_configuration.GetConnectionString("dbo")))
         {
@@ -195,6 +217,8 @@ Title=@Title
                     task.MyUploadedFile = file;
                     return task;
                 },
+
+            param: new { stateInput = maxState + 1, stateMinInput = minState - 1 },
                 splitOn: "Id" // The column where Dapper should start splitting the result set
             );
 

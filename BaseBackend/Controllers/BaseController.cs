@@ -13,13 +13,12 @@ namespace BaseBackend.Controllers
     public class BaseController : ControllerBase
     {
         private readonly EcuHandler _ecuHandler;
-        private readonly StringReplacementHandler _stringReplacementHandler;
+        private readonly TaskHandler _taskHandler;
 
-
-        public BaseController(EcuHandler ecuHandler, StringReplacementHandler stringReplacementHandler)
+        public BaseController(EcuHandler ecuHandler, TaskHandler taskHandler)
         {
             this._ecuHandler = ecuHandler;
-            this._stringReplacementHandler = stringReplacementHandler;
+            this._taskHandler = taskHandler;
         }
 
         // GET: apimyfiles
@@ -29,14 +28,11 @@ namespace BaseBackend.Controllers
             return Ok(_ecuHandler.GetAllEcus()); // Return the list as JSON
         }
 
-
-        [HttpGet("TestReplaceMentFunctions")]
-        public IActionResult TestFucntion1()
+        [HttpGet("FireAutomation")]
+        public IActionResult FireAutomation()
         {
-           var testPath= Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles\\user\\bmwx6HW07616431SW07628500.org");
-            _stringReplacementHandler.ReplaceStringsInFile(testPath, ["egr"], "5_1_4");
-
-            return Ok(_ecuHandler.GetAllEcus()); // Return the list as JSON
+            _taskHandler.CheckForOpenTasksAndHandle();
+            return Ok(); // Return the list as JSON
         }
 
 

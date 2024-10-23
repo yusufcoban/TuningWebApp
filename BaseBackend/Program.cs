@@ -1,3 +1,5 @@
+using BaseBackend.Controllers;
+
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -23,9 +25,9 @@ builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 builder.Services.AddScoped<TuningDatabaseHandler>();
 builder.Services.AddScoped<MyUploadedFileHandler>();
 builder.Services.AddScoped<StringReplacementHandler>();
-
-
+builder.Services.AddScoped<TaskHandler>();
 builder.Services.AddScoped<EcuHandler>();
+
 
 
 // Configure Authentication

@@ -1,57 +1,89 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
+﻿using System.Data.SqlClient;
 
 public class StringReplacementHandler
 {
     private readonly IConfiguration _configuration;
+    private MyUploadedFileHandler _myUploadedFileHandler;
+
 
     // Constructor to inject the connection string
-    public StringReplacementHandler(IConfiguration configuration)
+    public StringReplacementHandler(IConfiguration configuration, MyUploadedFileHandler myUploadedFile)
     {
         _configuration = configuration;
+        _myUploadedFileHandler = myUploadedFile;
+    }
+
+    public bool checkIfAllSolutionsAvailable(List<SolutionMapping> solutions, List<string> selectedTunings)
+    {
+        if (solutions.Any() && selectedTunings.Count() == solutions.Select(x => x.Name).Distinct().Count())
+        {
+            return true;
+        }
+        return false;
     }
 
     // Main function to replace strings in the file based on mappings and thresholds
-    public string ReplaceStringsInFile(string filePath, List<string> names, string tuningId)
+    public async Task<bool> ReplaceStringsInFile(MyUploadedFile MyUploadedFile, string filePath, List<string> names, string tuningId)
     {
         // Step 1: Read the content of the file as binary.
         byte[] fileContentBytes = File.ReadAllBytes(filePath); // Use binary file content
+        string outputFilePath = filePath + "_modded";
 
         // Step 2: Get mappings from SolutionMappings based on tuningId.
         var solutionMappings = GetSolutionMappings(tuningId, names);
 
-        // Step 3: Loop through the solution mappings.
-        foreach (var mapping in solutionMappings)
-        {
-            // Step 4: Get ReplacementStrings based on the mapping's ReplacementId.
-            var replacementCommands = GetReplacementCommands(mapping.ReplacementId);
-
-            // Step 5: For each replacement command, check if SearchString exists in the file and meets threshold.
-            foreach (var command in replacementCommands)
+        if (checkIfAllSolutionsAvailable(solutionMappings, names))
+        { // Step 3: Loop through the solution mappings.
+            foreach (var mapping in solutionMappings)
             {
-                var searchBytes = System.Text.Encoding.UTF8.GetBytes(command.SearchString);
+                // Step 4: Get ReplacementStrings based on the mapping's ReplacementId.
+                var replacementCommands = GetReplacementCommands(mapping.ReplacementId);
 
-                // Find the search string in the file with threshold similarity.
-                var matchingPositions = GetMatchingPositions(fileContentBytes, searchBytes, command.Threshold);
-
-                // Step 6: Replace the matches found
-                foreach (var position in matchingPositions)
+                // Step 5: For each replacement command, check if SearchString exists in the file and meets threshold.
+                foreach (var command in replacementCommands)
                 {
-                    // Replace the matched binary sequence with ReplaceString at the identified positions
-                    fileContentBytes = ReplaceAtPosition(fileContentBytes, position, command.ReplaceString);
+                    // Convert the hex SearchString to byte array
+                    var searchBytes = HexStringToByteArray(command.SearchString);
+
+                    // Find the search string in the file with threshold similarity.
+                    var matchingPositions = GetMatchingPositions(fileContentBytes, searchBytes, command.Threshold);
+
+                    // Step 6: Replace the matches found
+                    foreach (var position in matchingPositions)
+                    {
+                        // Replace the matched binary sequence with ReplaceString at the identified positions
+                        fileContentBytes = ReplaceAtPosition(fileContentBytes, position, command.ReplaceString);
+                    }
                 }
+                await _myUploadedFileHandler.UpdateUploadedFileStateAsync(MyUploadedFile.Id, 5); // set to finished
             }
+            // Step 7: Save the modified content back to the file.
+            File.WriteAllBytes(outputFilePath, fileContentBytes);
+
+            //Set finished to file
+                return true;
+        }
+        else
+        {
+            // set lookup 
+            await _myUploadedFileHandler.UpdateUploadedFileStateAsync(MyUploadedFile.Id, 1); // set to auto lookup finished
+            return false;
+
+        }
+    }
+
+    // Helper function to convert hex string to byte array
+    private byte[] HexStringToByteArray(string hex)
+    {
+        int length = hex.Length;
+        byte[] bytes = new byte[length / 2];
+
+        for (int i = 0; i < length; i += 2)
+        {
+            bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
         }
 
-        // Step 7: Save the modified content back to the file.
-        string outputFilePath = filePath + "_modded";
-        File.WriteAllBytes(outputFilePath, fileContentBytes);
-
-        // Return the modified content as a string (optional)
-        return System.Text.Encoding.UTF8.GetString(fileContentBytes);
+        return bytes;
     }
 
     // Find matching positions where the SearchString almost matches in the binary content
@@ -62,12 +94,19 @@ public class StringReplacementHandler
         // Loop through content and find positions where matches are above the threshold
         for (int i = 0; i <= contentBytes.Length - searchBytes.Length; i++)
         {
-            // Extract a window from the content
-            byte[] window = new byte[searchBytes.Length];
-            Array.Copy(contentBytes, i, window, 0, searchBytes.Length);
+            int currentMatchCount = 0;
 
-            // Calculate the similarity between the window and the search string
-            double matchPercentage = CalculateBinaryMatchPercentage(window, searchBytes);
+            // Compare bytes at the current position with search string
+            for (int j = 0; j < searchBytes.Length; j++)
+            {
+                if (contentBytes[i + j] == searchBytes[j])
+                {
+                    currentMatchCount++;
+                }
+            }
+
+            // Calculate the match percentage
+            double matchPercentage = ((double)currentMatchCount / searchBytes.Length) * 100;
 
             // If match percentage meets or exceeds the threshold, record the position
             if (matchPercentage >= threshold)
@@ -136,7 +175,7 @@ public class StringReplacementHandler
         {
             connection.Open();
             string query = @"
-                SELECT MappingId, ReplacementId
+                SELECT MappingId, ReplacementId, Name
                 FROM SolutionMappings
                 WHERE TuningSpecialInfoId = @TuningId AND Name IN (@Names)";
 
@@ -191,39 +230,6 @@ public class StringReplacementHandler
 
         return commands;
     }
-
-    // Find matching positions where the SearchString almost matches in the binary content
-    private List<int> GetMatchingPositions(byte[] contentBytes, string searchString, int threshold)
-    {
-        byte[] searchBytes = System.Text.Encoding.UTF8.GetBytes(searchString);
-        var matchingPositions = new List<int>();
-
-        // Loop through content and find positions where matches are above the threshold
-        for (int i = 0; i <= contentBytes.Length - searchBytes.Length; i++)
-        {
-            int currentMatchCount = 0;
-
-            // Compare bytes at the current position with search string
-            for (int j = 0; j < searchBytes.Length; j++)
-            {
-                if (contentBytes[i + j] == searchBytes[j])
-                {
-                    currentMatchCount++;
-                }
-            }
-
-            // Calculate the match percentage
-            double matchPercentage = ((double)currentMatchCount / searchBytes.Length) * 100;
-
-            // If match percentage meets or exceeds the threshold, record the position
-            if (matchPercentage >= threshold)
-            {
-                matchingPositions.Add(i);
-            }
-        }
-
-        return matchingPositions;
-    }
 }
 
 // Models to represent the database entities
@@ -231,6 +237,8 @@ public class SolutionMapping
 {
     public int MappingId { get; set; }
     public int ReplacementId { get; set; }
+    public string Name { get; set; }
+
 }
 
 public class ReplacementCommand
