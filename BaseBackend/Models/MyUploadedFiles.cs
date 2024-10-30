@@ -14,8 +14,6 @@ public class MyUploadedFile
     public DateTime ModifyDate { get; set; }
 
 
-    
-
     [Required]
     public int State { get; set; }
 
@@ -30,6 +28,8 @@ public class MyUploadedFile
 
     [Required]
     public string FileName { get; set; }
+
+    public string additionalInfo { get; set; }
 
 
     [StringLength(255)]

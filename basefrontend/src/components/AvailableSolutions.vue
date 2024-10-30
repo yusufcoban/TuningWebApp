@@ -61,6 +61,14 @@
                             </div>
                         </div>
                     </div>
+
+                    <section style="width: 97%; margin: auto; text-align: center;">
+                        <div>
+                            <h3>Additional infos for tuner</h3>
+                            <textarea id="status" rows="5" style="resize: none; width: 100%;"  v-model="additionalInfoUpload"></textarea>
+                        </div>
+                        <span id="text_counter">{{additionalInfoUpload.length}}</span> characters
+                    </section>
                 </div>
 
                 <!-- Upload area and send button -->
@@ -88,12 +96,18 @@
             solutions: Array, // Receives available solutions from the parent
             ecuInfoSelected: Array, // Receives ECU info from the parent,
             specialInfos: Array,
+
         },
         data() {
             return {
                 uploadedFile: null, // Store the uploaded file
-                dtcList:''
+                dtcList: '',
+                additionalInfoUpload: ''
             };
+        },
+        created() {
+            this.additionalInfoUpload = '';
+            this.dtcList = '';
         },
         methods: {
             emitCheckboxToggle(solution) {
@@ -125,10 +139,13 @@
                 // Append solutionId to FormData
                 formData.append('solutionid', this.specialInfos?.tuningId + '');
 
+                // Append additional information text
+                formData.append('additionalInfo', this.additionalInfoUpload || '');
+
                 // Assuming this.dtcList is a string like 'code1,code2;code3,code4'
                 // Assuming this.dtcList is a string that may be empty
                 let dtcListS = this.dtcList ? this.dtcList.split(/[,;]+/) : [];
-
+               
                 // If the array is empty, append an empty array to formData
                 if (dtcListS.length === 0) {
                     formData.append('dtcList[]', ''); // Option 1: Add an empty value
@@ -139,7 +156,7 @@
                         formData.append(`dtcList[${index}]`, listS);
                     });
                 }
-                
+
 
                 // Get the API URL from environment variables
                 const apiUrl = import.meta.env.VITE_API_BASE_URL;

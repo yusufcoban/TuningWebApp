@@ -107,7 +107,7 @@ namespace BaseBackend.Controllers
 
         // POST api/fileupload
         [HttpPost("upload")]
-        public async Task<IActionResult> UploadFile(IFormFile file, [FromForm] string[] solutions, [FromForm] string solutionid, [FromForm] string[] dtcList)
+        public async Task<IActionResult> UploadFile(IFormFile file, [FromForm] string[] solutions, [FromForm] string solutionid, [FromForm] string[] dtcList,[FromForm] string additionalInfo)
         {
 
             var username = User.Identity.Name; // This gets the username
@@ -155,6 +155,7 @@ namespace BaseBackend.Controllers
                 SelectedVariants = string.Join(", ", solutions),
                 CarmodelId = result,
                 TuningVariantId = solutionid,
+                additionalInfo= additionalInfo,
                 State = 0,
                 ModifyDate = DateTime.UtcNow,
                 Title = "test"
@@ -171,7 +172,7 @@ namespace BaseBackend.Controllers
             return Ok(new { Message = "File and solutions uploaded successfully." });
         }
 
-        private string fetchCurrentPathName(string filename,string userName="")
+        private string fetchCurrentPathName(string filename, string userName = "")
         {
             var username = userName;
             if (string.IsNullOrEmpty(userName))
@@ -179,7 +180,11 @@ namespace BaseBackend.Controllers
                 username = User.Identity.Name; // This gets the username
                 UserInformation currentUser = new UserInformation(username);
             }
-          
+            else
+            {
+                //Todo:Check for admin
+            }
+
             // Create the full file path (including the username as a subfolder under UploadedFiles)
             var filePath = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles", username, filename);
 

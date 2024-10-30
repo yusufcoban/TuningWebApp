@@ -1,8 +1,5 @@
 ﻿using Dapper;
 
-using Microsoft.Extensions.Configuration;
-
-using System.Data;
 using System.Data.SqlClient;
 
 public class MyUploadedFileHandler
@@ -21,8 +18,8 @@ public class MyUploadedFileHandler
     public async Task<int> AddUploadedFileAsync(MyUploadedFile uploadedFile)
     {
         const string query = @"
-            INSERT INTO MyUploadedFiles (Username, UploadDate, State, TuningVariantId, DTCList, Information, SelectedVariants, CarmodelId,FileName,ModifyDate,Title)
-            VALUES (@Username, @UploadDate, @State, @TuningVariantId, @DTCList, @Information, @SelectedVariants, @CarmodelId,@FileName,@ModifyDate,@Title);
+            INSERT INTO MyUploadedFiles (Username, UploadDate, State, TuningVariantId, DTCList, Information, SelectedVariants, CarmodelId,FileName,ModifyDate,Title,additionalInfo)
+            VALUES (@Username, @UploadDate, @State, @TuningVariantId, @DTCList, @Information, @SelectedVariants, @CarmodelId,@FileName,@ModifyDate,@Title,@additionalInfo);
             SELECT CAST(SCOPE_IDENTITY() as int);";
 
         using (var connection = new SqlConnection(_configuration.GetConnectionString("dbo")))
@@ -40,7 +37,8 @@ public class MyUploadedFileHandler
                 uploadedFile.CarmodelId,
                 uploadedFile.FileName,
                 uploadedFile.Title,
-                uploadedFile.ModifyDate
+                uploadedFile.ModifyDate,
+                uploadedFile.additionalInfo
 
             });
             CreateTaskAsync(result);

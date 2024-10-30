@@ -44,7 +44,7 @@
         <!-- Main Content -->
         <div class="flex-grow-1">
             <header class="header-bar colorLogo text-white d-flex align-items-center p-3 shadow">
-                <h1 class="m-0">Dashboard</h1>
+                <h1 class="m-0" style="">SgTuners</h1>
             </header>
 
             <div class="p-4 content-area">
