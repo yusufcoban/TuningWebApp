@@ -3,12 +3,12 @@ import { createRouter, createWebHistory } from 'vue-router';
 import Login from '@/components/Login.vue'; // Login component
 import Home from '@/components/Home.vue'; // Home component
 import { useStore } from 'vuex'; // Vuex store
-import App from './App.vue'; // Main layout
+import App from '@/App.vue'; // Main layout
 import MyFiles from '@/components/MyFiles.vue'; // Main layout
 import OpenTasks from '@/components/OpenTasks.vue'; // Admin task overview
 
 import MyFilesViewer from '@/components/MyFilesViewer.vue';
-import AutoDatabase from './components/AutoDatabase.vue'; // Dashboard component
+import AutoDatabase from '@/components/AutoDatabase.vue'; // Dashboard component
 
 // Define your routes
 const routes = [

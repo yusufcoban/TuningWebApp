@@ -2,13 +2,7 @@
 
 using Dapper;
 
-using Microsoft.AspNetCore.Identity.Data;
-using Microsoft.Extensions.Configuration;
-using Microsoft.VisualBasic;
-
-using System;
 using System.Data.SqlClient;
-using System.Runtime.CompilerServices;
 
 namespace YourNamespace.Controllers
 {

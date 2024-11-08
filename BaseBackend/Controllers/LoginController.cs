@@ -26,28 +26,36 @@ public class AuthController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        // Validate user credentials against the database
-        var user = ValidateUserCredentials(request.Username, request.Password);
-        if (user != null)
+        try
         {
-            // Create claims for the logged-in user
-            var claims = new List<Claim>
+            // Validate user credentials against the database
+            var user = ValidateUserCredentials(request.Username, request.Password);
+            if (user != null)
+            {
+                // Create claims for the logged-in user
+                var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, request.Username),
                 new Claim(ClaimTypes.Role, user.Role)  // Set user role from DB if needed
             };
 
-            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
 
-            // Sign in the user with cookie authentication
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
+                // Sign in the user with cookie authentication
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
 
-            return Ok(new { message = "Login successful", role = user.Role });
+                return Ok(new { message = "Login successful", role = user.Role });
+            }
+            return Unauthorized(new { message = "Invalid username or password"+"\r\n"+_configuration.GetConnectionString("dbo") });
+
         }
-
-        return Unauthorized(new { message = "Invalid username or password" });
-    }
+        catch (Exception ex)
+        {
+            //DEBUG
+            
+            return BadRequest(ex.Message + "\r\n"+_configuration.GetConnectionString("dbo"));
+        } }
 
     // Logout Action
     [HttpPost("logout")]
@@ -86,6 +94,7 @@ public class AuthController : ControllerBase
         }
     }
 
+    
     // Method to validate user credentials
     private User ValidateUserCredentials(string username, string password)
     {
