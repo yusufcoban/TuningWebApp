@@ -1,0 +1,7 @@
+[credential "https://repo.schnaithmann.de"]
+	provider = generic
+[user]
+	name = Yusuf Coban
+	email = coban@schnaithmann.de
+[pull]
+	rebase = false

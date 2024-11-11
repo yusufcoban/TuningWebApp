@@ -24,7 +24,7 @@ export default defineConfig({
     server: {
         proxy: {
             '/api': {
-                target: 'https://localhost:4430', // Backend server URL
+                target: 'https://ia.sgtuners.es:4430', // Backend server URL
                 changeOrigin: true,  // Needed to handle CORS
                 secure: false,       // Allow self-signed certificates if necessary
                 rewrite: (path) => path.replace(/^\/api/, '') // Optional, if your backend routes start without `/api`
