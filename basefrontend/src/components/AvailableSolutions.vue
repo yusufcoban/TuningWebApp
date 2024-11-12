@@ -1,5 +1,5 @@
-<template>
-    <div class="container-fluid d-flex">
+<template >
+   <div class="container-fluid d-flex">
         <!-- Fixed Sidebar -->
         <aside class="sidebar">
             <h5 class="text-gray-800 w-bolder mb-4">ECU Info Selected</h5>

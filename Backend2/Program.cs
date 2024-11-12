@@ -63,7 +63,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", builder =>
     {
-        builder.WithOrigins("https://ia.sgtuners.es")
+        builder.WithOrigins("https://ia.sgtuners.es", "http://localhost:5173") // Include both origins here
                .AllowAnyHeader()
                .AllowAnyMethod()
                .AllowCredentials(); // Allow cookies if using authentication
@@ -79,6 +79,7 @@ app.UseSwaggerUI();
 // Enable HTTPS redirection and CORS
 app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
+
 
 app.UseAuthentication();
 app.UseAuthorization();
