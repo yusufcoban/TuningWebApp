@@ -295,8 +295,6 @@
                                     </div>
 
                                     <div v-if="item.checked" class="mt-2 ml-4">
-                                        <button type="button" class="btn btn-secondary mb-2" @click="addReplacementLine(item)">Add Replacement Line</button>
-
                                         <div v-for="(line, lineIndex) in item.replacementLines" :key="lineIndex" class="replacement-line mb-2">
                                             <label>Search String:</label>
                                             <input type="text" v-model="line.searchString" class="form-control mb-1" placeholder="Enter search string" />
@@ -304,12 +302,14 @@
                                             <label>Replacement String:</label>
                                             <input type="text" v-model="line.replacementString" class="form-control mb-1" placeholder="Enter replacement string" />
 
-                                            <label>Number:</label>
-                                            <input type="number" v-model="line.number" class="form-control mb-1" placeholder="Enter number" />
+                                            <label>Threshold:</label>
+                                            <input type="number" v-model="line.number" class="form-control mb-1" placeholder="Enter threshold (0-100)" />
 
                                             <!-- Remove line button -->
                                             <button type="button" class="btn btn-danger" @click="removeReplacementLine(item, lineIndex)">Remove Line</button>
                                         </div>
+
+                                        <button type="button" class="btn btn-secondary mb-2" @click="addReplacementLine(item)">Add Replacement Line</button>
                                     </div>
                                 </div>
 
@@ -458,7 +458,7 @@
                     const data = await response.json();
                     this.ecuList = data; // Store fetched tuning info
                     // Group tuning info by type and include tuningId in each variant
-                   
+
 
                 } catch (error) {
                     console.error('Error fetching tuning data:', error); // Log the error for debugging
@@ -481,11 +481,11 @@
                             Name: item.label, // Get name from the label
                             Information: "string", // Replace with the actual information if needed
                             Value1: item.value1, // Get value1 from the item's value1
-                            Value2: item.value2
-
+                            Value2: item.value2,
+                            ReplacementStrings: item.replacementLines
                             //Todo:getlist// Get value2 from the item's value2
                         });
-                        toggleReplacementArea(item)
+                        this.toggleReplacementArea(item)
                     }
                 });
             },
@@ -534,6 +534,7 @@
                     item.checked = false; // Reset checked state to false
                     item.value1 = 0; // Reset value1 to 0
                     item.value2 = 0; // Reset value2 to 0
+                    item.replacementLines = [];
                 });
             },
             async submitForm() {

@@ -22,10 +22,19 @@ public class input_SelectedEcu
     public int Id { get; set; }
 }
 
+public class input_ReplacementStrings
+{
+    public string searchString { get; set; }
+    public string replacementString { get; set; }
+    public int number { get; set; }
+}
+
+
 public class input_AvailableSolution
 {
     public string Name { get; set; }
     public string Information { get; set; }
     public int Value1 { get; set; }
     public int Value2 { get; set; }
+    public List<input_ReplacementStrings> replacementStrings { get; set; }
 }

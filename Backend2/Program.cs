@@ -2,6 +2,7 @@ using BaseBackend.Controllers;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.OpenApi.Models;
 using YourNamespace.Controllers;
+using YourNamespace.Handler;
 
 var builder = WebApplication.CreateBuilder(args);
 

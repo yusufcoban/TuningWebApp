@@ -4,15 +4,20 @@ using Dapper;
 
 using System.Data.SqlClient;
 
+using YourNamespace.Handler;
+
 namespace YourNamespace.Controllers
 {
     public class TuningDatabaseHandler
     {
         private readonly IConfiguration _configuration;
+        private readonly StringReplacementHandler _stringReplacementHandler;
 
-        public TuningDatabaseHandler(IConfiguration configuration)
+
+        public TuningDatabaseHandler(IConfiguration configuration, StringReplacementHandler stringReplacementHandler)
         {
             _configuration = configuration;
+            _stringReplacementHandler = stringReplacementHandler;
         }
 
 
@@ -110,6 +115,10 @@ namespace YourNamespace.Controllers
             foreach (var solution in inputNewVariant.AvailableSolutions)
             {
                 CreateNewAvailableSolution(newTuningVariantId, solution.Name, solution.Information, solution.Value1, solution.Value2);
+                foreach (input_ReplacementStrings item in solution.replacementStrings)
+                {
+                    _stringReplacementHandler.InsertReplacementStringAsync(newTuningVariantId, solution.Name, item.searchString, item.replacementString, item.number);
+                }
             }
 
             // Return the new TuningVariantId or a success message indicating the tuning variant has been created
@@ -335,7 +344,7 @@ namespace YourNamespace.Controllers
             }
         }
 
-      
+
     }
 
 }
