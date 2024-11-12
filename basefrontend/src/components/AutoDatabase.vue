@@ -293,6 +293,24 @@
                                                class="form-control"
                                                placeholder="Value 2" />
                                     </div>
+
+                                    <div v-if="item.checked" class="mt-2 ml-4">
+                                        <button type="button" class="btn btn-secondary mb-2" @click="addReplacementLine(item)">Add Replacement Line</button>
+
+                                        <div v-for="(line, lineIndex) in item.replacementLines" :key="lineIndex" class="replacement-line mb-2">
+                                            <label>Search String:</label>
+                                            <input type="text" v-model="line.searchString" class="form-control mb-1" placeholder="Enter search string" />
+
+                                            <label>Replacement String:</label>
+                                            <input type="text" v-model="line.replacementString" class="form-control mb-1" placeholder="Enter replacement string" />
+
+                                            <label>Number:</label>
+                                            <input type="number" v-model="line.number" class="form-control mb-1" placeholder="Enter number" />
+
+                                            <!-- Remove line button -->
+                                            <button type="button" class="btn btn-danger" @click="removeReplacementLine(item, lineIndex)">Remove Line</button>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <button type="submit" class="btn btn-primary mt-4">Submit</button>
@@ -353,12 +371,12 @@
                     availableSolutions: []
                 },
                 checkableItems: [
-                    { id: 'egr', label: 'egr', checked: false, showValues: false, value1: 0, value2: 0 },
-                    { id: 'adblue', label: 'adblue', checked: false, showValues: false, value1: 0, value2: 0 },
-                    { id: 'stage1', label: 'stage1', checked: false, showValues: true, value1: 0, value2: 0, textValue1: 'Enter increase in kW', textValue2: 'Enter increase in NM' },
-                    { id: 'stage2', label: 'stage2', checked: false, showValues: true, value1: 0, value2: 0, textValue1: 'Enter increase in kW', textValue2: 'Enter increase in NM' },
-                    { id: 'dtc', label: 'dtc', checked: false, showValues: false, value1: 0, value2: 0 },
-                    { id: 'flaps', label: 'flaps', checked: false, showValues: false, value1: 0, value2: 0 },
+                    { id: 'egr', label: 'egr', checked: false, showValues: false, value1: 0, value2: 0, replacementLines: [] },
+                    { id: 'adblue', label: 'adblue', checked: false, showValues: false, value1: 0, value2: 0, replacementLines: [] },
+                    { id: 'stage1', label: 'stage1', checked: false, showValues: true, value1: 0, value2: 0, textValue1: 'Enter increase in kW', textValue2: 'Enter increase in NM', replacementLines: [] },
+                    { id: 'stage2', label: 'stage2', checked: false, showValues: true, value1: 0, value2: 0, textValue1: 'Enter increase in kW', textValue2: 'Enter increase in NM', replacementLines: [] },
+                    { id: 'dtc', label: 'dtc', checked: false, showValues: false, value1: 0, value2: 0, replacementLines: [] },
+                    { id: 'flaps', label: 'flaps', checked: false, showValues: false, value1: 0, value2: 0, replacementLines: [] },
                 ],
                 ecuList: [
                     { Id: 1, EcuName: "MED17.7", ConnectionInfoId: 12 },
@@ -405,6 +423,23 @@
             }
         },
         methods: {
+            toggleReplacementArea(item) {
+                if (!item.checked) {
+                    item.replacementLines = []; // Clear lines if unchecked
+                }
+            },
+            // Method to add a new replacement line
+            addReplacementLine(item) {
+                item.replacementLines.push({
+                    searchString: '',
+                    replacementString: '',
+                    number: null,
+                });
+            },
+            // Method to remove a specific replacement line
+            removeReplacementLine(item, lineIndex) {
+                item.replacementLines.splice(lineIndex, 1);
+            },
             async getEcuListBackend() {
                 this.ecuList = [];
                 const apiUrl = import.meta.env.VITE_API_BASE_URL; // Get base URL from environment variables
@@ -441,12 +476,16 @@
                 // Populate available solutions based on selected items
                 this.checkableItems.forEach(item => {
                     if (item.checked) {
+
                         this.formData.availableSolutions.push({
                             Name: item.label, // Get name from the label
                             Information: "string", // Replace with the actual information if needed
                             Value1: item.value1, // Get value1 from the item's value1
-                            Value2: item.value2  // Get value2 from the item's value2
+                            Value2: item.value2
+
+                            //Todo:getlist// Get value2 from the item's value2
                         });
+                        toggleReplacementArea(item)
                     }
                 });
             },

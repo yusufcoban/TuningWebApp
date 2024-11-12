@@ -9,7 +9,6 @@ namespace BaseBackend.Controllers
     {
         private readonly StringReplacementHandler _stringReplacementHandler;
         private readonly MyUploadedFileHandler _myUploadedFileHandler;
-
         private readonly IConfiguration _configuration;
 
         public TaskHandler(IConfiguration configuration, StringReplacementHandler stringReplacementHandler, MyUploadedFileHandler myUploadedFileHandler)
@@ -32,12 +31,8 @@ namespace BaseBackend.Controllers
                     string outputFilePath = testPath + "_modded";
                     this.UpdateFileName(item.MyUploadedFile.Id, outputFilePath);
                 }
-
-
             }
-
         }
-
 
         public async void UpdateFileName(int id, string NewFileName)
         {
@@ -50,7 +45,5 @@ namespace BaseBackend.Controllers
                 connection.Execute(sql, new { id = id, NewFileName = NewFileName });
             }
         }
-
-
     }
 }
