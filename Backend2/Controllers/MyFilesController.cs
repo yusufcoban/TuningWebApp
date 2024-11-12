@@ -174,7 +174,14 @@ namespace BaseBackend.Controllers
             }
 
             //firing up automation
-            System.Threading.Tasks.Task.Run(() => _taskHandler.CheckForOpenTasksAndHandle());
+            System.Threading.Tasks.Task.Run(async () =>
+            {
+                // Wait for 15 seconds
+                await System.Threading.Tasks.Task.Delay(TimeSpan.FromSeconds(15));
+
+                // Start the task after the delay
+                _taskHandler.CheckForOpenTasksAndHandle();
+            });
 
             return Ok(new { Message = "File and solutions uploaded successfully." });
         }
