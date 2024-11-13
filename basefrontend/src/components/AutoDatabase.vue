@@ -105,7 +105,7 @@
         <Modal v-model="isOpenFromOutside" :fullscreen="false" :clickOut="true" style="margin-left: 10vw;">
             <div class="modal" tabindex="-1" role="dialog">
                 <div class="modal-dialog" role="document">
-                    <div class="modal-content" style="min-width:100em;">
+                    <div class="modal-content" style="min-width:80em;max-height:60em;">
                         <div class="modal-header">
                             <div class="mb-4">
                                 <img :src="getModelByGivenId(preselectedModelId).icon" class="brand-icon" style="width: 50px; height: auto;">
@@ -205,7 +205,7 @@
         <Modal v-model="isOpenFromOutsideModel" :fullscreen="false" :clickOut="true" style="margin-left: 5vw;">
             <div class="modal" tabindex="-1" role="dialog">
                 <div class="modal-dialog" role="document">
-                    <div class="modal-content" style="min-width: 100em;">
+                    <div class="modal-content" style="min-width: 80em; max-height: 60em;">
                         <!-- Match the first modal's min-width -->
                         <div class="modal-header">
                             <div class="mb-4">
@@ -251,7 +251,7 @@
                                 <div class="row mb-8">
                                     <div class="col-xs-4 form-group">
                                         <label for="fuelVariant">Fuel Variant</label>
-                                        <select id="fuelVariant" v-model="formData.fuelVariant" class="form-control" required>
+                                        199<select id="fuelVariant" v-model="formData.fuelVariant" class="form-control" required>
                                             <option value="petrol">Petrol</option>
                                             <option value="diesel">Diesel</option>
                                         </select>

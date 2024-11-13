@@ -131,10 +131,14 @@ namespace YourNamespace.Handler
         // Replace content at the specific position with ReplaceString
         private byte[] ReplaceAtPosition(byte[] contentBytes, int position, string replaceString)
         {
-            byte[] replaceBytes = System.Text.Encoding.UTF8.GetBytes(replaceString);
+            // Convert the hex string to a byte array
+            byte[] replaceBytes = Enumerable.Range(0, replaceString.Length / 2)
+                                            .Select(x => Convert.ToByte(replaceString.Substring(x * 2, 2), 16))
+                                            .ToArray();
+
             int replaceLength = replaceBytes.Length;
 
-            // Create a new byte array for the result
+            // Create a new byte array for the result with the same length as contentBytes
             byte[] modifiedContent = new byte[contentBytes.Length];
 
             // Copy all content before the replacement position
