@@ -93,6 +93,7 @@ namespace BaseBackend.Models
         public List<AvailableSolution> AvailableSolutions { get; set; } = new List<AvailableSolution>(); // Initialize list
         public string AdditionalInformation { get; set; }
         public int EcuInfoId { get; set; }
+        public bool isDeleted { get; set; }
         public EcuInfo EcuInfo { get; set; }
     }
 
@@ -124,6 +125,6 @@ namespace BaseBackend.Models
 
         public string ConnectionTypeName => ((ConnectionTypeEnum)Type).ToString(); // Computed property
         public string ToolNameString => ((ToolInfoId)Type).ToString();
-       
+
     }
 }

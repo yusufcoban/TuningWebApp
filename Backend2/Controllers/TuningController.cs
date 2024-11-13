@@ -45,7 +45,7 @@ namespace YourNamespace.Controllers
         }
 
         [HttpGet("tuningecuListFull")]
-        public ActionResult<TuningSpecialInfo> GetEcuList()
+        public ActionResult<EcuInfo> GetEcuList()
         {
             return Ok(_tuningDatabaseHandler.GetEcuList());
         }
@@ -54,6 +54,14 @@ namespace YourNamespace.Controllers
         public ActionResult<TuningSpecialInfo> GenerateTuningVariant(InputNewVariant inputNewVariant)
         {
             return Ok(_tuningDatabaseHandler.GenerateTuningVariant(inputNewVariant));
+        }
+
+        //Todo check for admin
+        [HttpPost("DeleteTuningVariant")]
+        public ActionResult<TuningSpecialInfo> DeleteTuningVariant(StringInput stringInput)
+        {
+            _tuningDatabaseHandler.DeleteTuningVariant(stringInput.Input);
+            return Ok();
         }
     }
 }

@@ -12,6 +12,13 @@ public class InputNewVariant
     public List<input_AvailableSolution> AvailableSolutions { get; set; }
 }
 
+public class StringInput
+{
+    public string Input { get; set; }
+}
+
+
+
 public class input_CarBrandInfo
 {
     public string Id { get; set; }

@@ -54,12 +54,12 @@ namespace YourNamespace.Controllers
                 con.Open();
 
                 // SQL query to fetch TuningDatabaseInfo with filtered TuningVariants
-                var carBrands = con.Query<TuningDatabaseInfo>("SELECT * FROM TuningDatabaseInfo Where Id =@id", new { id });
+                var carBrands = con.Query<TuningDatabaseInfo>("SELECT * FROM TuningDatabaseInfo Where Id =@id  ", new { id });
                 if (carBrands != null)
                 {
                     foreach (var item in carBrands)
                     {
-                        item.Variants = con.Query<TuningVariant>("SELECT * FROM TuningVariant Where TuningId LIKE '" + id + "%" + "'").ToList();
+                        item.Variants = con.Query<TuningVariant>("SELECT * FROM TuningVariant Where TuningId LIKE '" + id + "%" + "' and isDeleted  = 0").ToList();
                     }
 
                 }
@@ -123,6 +123,16 @@ namespace YourNamespace.Controllers
 
             // Return the new TuningVariantId or a success message indicating the tuning variant has been created
             return newTuningVariantId; // or return a confirmation message
+        }
+
+        // Mark given tuning_variant_id as deleted
+        public void DeleteTuningVariant(string tuning_variant_id)
+        {
+            string deleteQuery = "UPDATE [TuningSpecialInfo] set [isDeleted] = 'True' where TuningVariant = @tuning_variant_id";
+            using (var con = new SqlConnection(_configuration.GetConnectionString("dbo")))
+            {
+                con.Execute(deleteQuery, new { tuning_variant_id });
+            }
         }
 
         // Example of fetching AvailableSolutions (adjust based on your structure)
