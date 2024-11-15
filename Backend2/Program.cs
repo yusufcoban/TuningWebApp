@@ -5,6 +5,9 @@ using YourNamespace.Controllers;
 using YourNamespace.Handler;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Logging.AddConsole();               // Adds console logging, outputs to stdout
+builder.Logging.AddDebug();
+builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging")); // Optional: Loads logging settings from configuration
 
 // Add services to the container.
 builder.Services.AddControllersWithViews(); // For MVC support

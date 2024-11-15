@@ -1,4 +1,6 @@
-﻿using Dapper;
+﻿using BaseBackend.Controllers;
+
+using Dapper;
 
 using System.Data.SqlClient;
 
@@ -6,15 +8,18 @@ namespace YourNamespace.Handler
 {
     public class StringReplacementHandler
     {
+        private readonly ILogger<StringReplacementHandler> _logger;
+
         private readonly IConfiguration _configuration;
         private MyUploadedFileHandler _myUploadedFileHandler;
 
 
         // Constructor to inject the connection string
-        public StringReplacementHandler(IConfiguration configuration, MyUploadedFileHandler myUploadedFile)
+        public StringReplacementHandler(IConfiguration configuration, MyUploadedFileHandler myUploadedFile, ILogger<StringReplacementHandler> ilogger)
         {
             _configuration = configuration;
             _myUploadedFileHandler = myUploadedFile;
+            _logger = ilogger;  
         }
 
         public bool checkIfAllSolutionsAvailable(List<SolutionMapping> solutions, List<string> selectedTunings)
@@ -29,17 +34,24 @@ namespace YourNamespace.Handler
         // Main function to replace strings in the file based on mappings and thresholds
         public async Task<bool> ReplaceStringsInFile(MyUploadedFile MyUploadedFile, string filePath, List<string> names, string tuningId)
         {
+             _logger.LogError(MyUploadedFile.FileName + " replacement strings will be checked...");
+
             // Step 1: Read the content of the file as binary.
             byte[] fileContentBytes = File.ReadAllBytes(filePath); // Use binary file content
             string outputFilePath = filePath + "_modded";
 
             // Step 2: Get mappings from SolutionMappings based on tuningId.
             var solutionMappings = GetSolutionMappings(tuningId, names);
+             _logger.LogError(solutionMappings.Count() + " automations were found for this solution...");
 
             if (checkIfAllSolutionsAvailable(solutionMappings, names))
             { // Step 3: Loop through the solution mappings.
+                 _logger.LogError("All selected solutions are available for this file request");
+
                 foreach (var mapping in solutionMappings)
                 {
+                     _logger.LogError("Solution " + mapping.Name + " will be procedured...");
+
                     // Step 4: Get ReplacementStrings based on the mapping's ReplacementId.
                     var replacementCommands = GetReplacementCommands(mapping.ReplacementId);
 
@@ -51,12 +63,15 @@ namespace YourNamespace.Handler
 
                         // Find the search string in the file with threshold similarity.
                         var matchingPositions = GetMatchingPositions(fileContentBytes, searchBytes, command.Threshold);
+                         _logger.LogError("Solution " + mapping.Name + " could be found on the target file...");
 
                         // Step 6: Replace the matches found
                         foreach (var position in matchingPositions)
                         {
+
                             // Replace the matched binary sequence with ReplaceString at the identified positions
                             fileContentBytes = ReplaceAtPosition(fileContentBytes, position, command.ReplaceString);
+                             _logger.LogError("Solution " + mapping.Name + " step algorithm is effected...");
                         }
                     }
                     await _myUploadedFileHandler.UpdateUploadedFileStateAsync(MyUploadedFile.Id, 5); // set to finished
@@ -204,7 +219,7 @@ namespace YourNamespace.Handler
                     {
                         MappingId = reader.GetInt32(0),
                         ReplacementId = reader.GetInt32(1),
-                        Name= reader.GetString(2),
+                        Name = reader.GetString(2),
                     });
                 }
             }
@@ -212,7 +227,7 @@ namespace YourNamespace.Handler
             return mappings;
         }
 
-        public void InsertReplacementStringAsync(string tuningspecialid,string name,string searchString, string replaceString, int threshold, int action = 1, string description = "")
+        public void InsertReplacementStringAsync(string tuningspecialid, string name, string searchString, string replaceString, int threshold, int action = 1, string description = "")
         {
             using (var connection = new SqlConnection(_configuration.GetConnectionString("dbo")))
             {
@@ -234,12 +249,12 @@ namespace YourNamespace.Handler
                 INSERT INTO SolutionMappings (TuningSpecialInfoId, Name, ReplacementId)
                 VALUES (@TuningSpecialInfoId, @Name, @ReplacementId)";
 
-                 connection.ExecuteScalar<int>(solutionMappingsQuery, new
+                connection.ExecuteScalar<int>(solutionMappingsQuery, new
                 {
-                     TuningSpecialInfoId = tuningspecialid,
-                     Name = name,
-                     ReplacementId = newId
-                 });
+                    TuningSpecialInfoId = tuningspecialid,
+                    Name = name,
+                    ReplacementId = newId
+                });
             }
         }
 
