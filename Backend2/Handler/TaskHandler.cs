@@ -45,8 +45,7 @@ namespace BaseBackend.Controllers
                 }
                 catch (Exception ex)
                 {
-
-                    throw ex;
+                    UpdateStateMyUploadedFile(item.MyUploadedFileId, 6, "File not found...."+ex.Message);
                 }
 
             }
@@ -61,6 +60,18 @@ namespace BaseBackend.Controllers
                 // Get the stored hash for the user
                 string sql = "UPDATE [Task] Set [NewFileName] =@NewFileName WHERE [MyUploadedFileId] = @id";
                 connection.Execute(sql, new { id = id, NewFileName = NewFileName });
+            }
+        }
+
+        public async void UpdateStateMyUploadedFile(int id, int state, string comment="")
+        {
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("dbo").ToString()))
+            {
+                connection.Open();
+
+                // Get the stored hash for the user
+                string sql = "UPDATE [MyUploadedFiles] Set [State] =@state, additionalInfo=@comment WHERE [Id] = @id";
+                connection.Execute(sql, new { id = id, state = state , comment = comment });
             }
         }
     }
