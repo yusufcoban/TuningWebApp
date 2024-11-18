@@ -1,9 +1,10 @@
-﻿using Dapper;
-using System.Data.SqlClient;
-using System.Collections.Generic;
-using BaseBackend.Models;
+﻿using BaseBackend.Models;
 
-namespace YourNamespace.Controllers
+using Dapper;
+
+using System.Data.SqlClient;
+
+namespace TuningWebApp.Controllers
 {
     public class EcuHandler
     {

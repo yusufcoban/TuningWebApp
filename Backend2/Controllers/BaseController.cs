@@ -1,9 +1,7 @@
-﻿using BaseBackend.Models; // Import your model namespace
-
-using Microsoft.AspNetCore.Authorization; // Add this namespace
+﻿using Microsoft.AspNetCore.Authorization; // Add this namespace
 using Microsoft.AspNetCore.Mvc;
 
-using YourNamespace.Controllers;
+using TuningWebApp.Controllers;
 
 namespace BaseBackend.Controllers
 {
