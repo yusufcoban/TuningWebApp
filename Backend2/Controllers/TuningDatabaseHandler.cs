@@ -77,7 +77,7 @@ namespace YourNamespace.Controllers
                 con.Open();
 
                 // SQL query to fetch tuning special info by Tuning ID
-                var query = "SELECT * FROM TuningSpecialInfo WHERE Id = @Id";
+                var query = "SELECT * FROM TuningSpecialInfo WHERE Id = @Id and isdeleted=0";
 
                 // Fetching data and mapping to List<TuningSpecialInfo>
                 var tuningSpecialInfos = con.Query<TuningSpecialInfo>(query, new { Id = id }).ToList();
@@ -98,6 +98,36 @@ namespace YourNamespace.Controllers
             }
         }
 
+        public void DeleteTuningVariant(string tuningVariantId)
+        {
+            using (var con = new SqlConnection(_configuration.GetConnectionString("dbo")))
+            {
+                con.Open();
+
+                // Mark the TuningVariant record as deleted
+                string deleteTuningVariantQuery = @"
+            UPDATE [TuningVariant]
+            SET [isDeleted] = 1
+            WHERE [TuningId] = @TuningId";
+                con.Execute(deleteTuningVariantQuery, new { TuningId = tuningVariantId });
+
+                // Mark associated TuningSpecialInfo records as deleted
+                string deleteTuningSpecialInfoQuery = @"
+            UPDATE [TuningSpecialInfo]
+            SET [isDeleted] = 1
+            WHERE [Id] = @TuningId";
+                con.Execute(deleteTuningSpecialInfoQuery, new { TuningId = tuningVariantId });
+
+                // Mark related AvailableSolution records as deleted
+                string deleteAvailableSolutionQuery = @"
+            UPDATE [AvailableSolution]
+            SET [isDeleted] = 1
+            WHERE [TuningSpecialInfoId] = @TuningId";
+                con.Execute(deleteAvailableSolutionQuery, new { TuningId = tuningVariantId });
+
+                // Additional tables can be handled here if needed
+            }
+        }
 
 
         public string GenerateTuningVariant(InputNewVariant inputNewVariant)
@@ -123,16 +153,6 @@ namespace YourNamespace.Controllers
 
             // Return the new TuningVariantId or a success message indicating the tuning variant has been created
             return newTuningVariantId; // or return a confirmation message
-        }
-
-        // Mark given tuning_variant_id as deleted
-        public void DeleteTuningVariant(string tuning_variant_id)
-        {
-            string deleteQuery = "UPDATE [TuningSpecialInfo] set [isDeleted] = 'True' where TuningVariant = @tuning_variant_id";
-            using (var con = new SqlConnection(_configuration.GetConnectionString("dbo")))
-            {
-                con.Execute(deleteQuery, new { tuning_variant_id });
-            }
         }
 
         // Example of fetching AvailableSolutions (adjust based on your structure)

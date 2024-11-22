@@ -68,7 +68,9 @@
                                     <button v-if="isAdmin" class="btn btn-primary btn-sm">
                                         <font-awesome-icon icon="plus" /> New variant
                                     </button>
+
                                 </span>
+                                
                             </span>
                         </div>
                         <div class="card-body">
@@ -76,12 +78,23 @@
                             <ul class="list-unstyled">
                                 <li v-for="(petrol, index) in group.petrol" :key="index" class="text-gray-900 fs-6">
                                     <a href="#" @click.prevent="showDetails(petrol)">{{ petrol.engine }} - {{ petrol.year }} - {{ petrol.horsepower }} {{ petrol.ecuType }}</a>
+                                    <span v-if="isAdmin" @click="openDeleteDialog(petrol.tuningId)" class="plus-icon" title="Add New Model" data-bs-toggle="modal" data-bs-target="#addModelModal">
+                                        <button class="btn btn-primary btn-sm">
+                                            <font-awesome-icon icon="trash-can" />  Delete
+                                        </button>
+                                    </span>
                                 </li>
                             </ul>
                             <h7 class="text-gray-800">Diesel Models</h7>
                             <ul class="list-unstyled">
                                 <li v-for="(diesel, index) in group.diesel" :key="index" class="text-gray-900 fs-6">
                                     <a href="#" @click.prevent="showDetails(diesel)">{{ diesel.engine }} - {{ diesel.year }} - {{ diesel.horsepower }} {{ diesel.ecuType }}</a>
+                                    <span v-if="isAdmin" @click="openDeleteDialog(diesel.tuningId)" class="plus-icon" title="Add New Model" data-bs-toggle="modal" data-bs-target="#addModelModal">
+                                        <button class="btn btn-primary btn-sm">
+                                            <font-awesome-icon icon="trash-can" />  Delete
+                                        </button>
+
+                                    </span>
                                 </li>
                             </ul>
                         </div>
@@ -325,6 +338,27 @@
         </Modal>
 
 
+        <Modal v-model="isDeleteModalOpen" :fullscreen="false" :clickOut="true" style="margin-left: 5vw;">
+            <div class="modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content" style="min-width: 30em; max-height: 20em;">
+                        <!-- Match the first modal's min-width -->
+                        <div class="modal-header">
+                            <button type="button" class="close" @click="closeDeleteDialog" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            Do you want to delete this solution?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" @click="closeDeleteDialog">Cancel</button>
+                            <button type="button" class="btn btn-danger" @click="confirmDelete">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </Modal>
     </div>
 </template>
 
@@ -382,7 +416,9 @@
                     { Id: 1, EcuName: "MED17.7", ConnectionInfoId: 12 },
                     { Id: 2, EcuName: "MED17.8", ConnectionInfoId: 13 },
                     // Add more ECUs as needed
-                ]
+                ],
+                isDeleteModalOpen: false, // Modal visibility
+                deleteTargetId: null
             };
         },
         components: {
@@ -423,6 +459,42 @@
             }
         },
         methods: {
+            // Open delete confirmation dialog
+            openDeleteDialog(id) {
+                debugger;
+                this.deleteTargetId = id; // Store the ID of the item to delete
+                this.isDeleteModalOpen = true; // Show the modal
+            },
+            // Close the delete dialog
+            closeDeleteDialog() {
+                this.isDeleteModalOpen = false; // Hide the modal
+                this.deleteTargetId = null;     // Clear the target ID
+            },
+            // Perform delete operation
+            async confirmDelete() {
+                if (!this.deleteTargetId) return;
+
+                const apiUrl = import.meta.env.VITE_API_BASE_URL; // API base URL
+                try {
+                    const response = await fetch(`${apiUrl}/api/Tuning/DeleteTuning/${this.deleteTargetId}`, {
+                        method: 'POST', // Use POST or DELETE based on your API
+                        credentials: 'include', // Include cookies or tokens
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Error! HTTP status: ${response.status}`);
+                    }
+
+                    // Refresh data or update the UI after successful deletion
+                    this.fetchTuningData(this.preselectedModelId);
+                    alert('Item deleted successfully.');
+                } catch (error) {
+                    console.error('Error deleting item:', error);
+                    alert('Failed to delete the item.');
+                } finally {
+                    this.closeDeleteDialog(); // Close the modal
+                }
+            },
             toggleReplacementArea(item) {
                 if (!item.checked) {
                     item.replacementLines = []; // Clear lines if unchecked
@@ -768,14 +840,12 @@
 
 
 <style scoped>
-    .modal-body
-    {
+    .modal-body {
         overflow-y: scroll;
         height: 1050px
     }
 
-    .modal-dialog
-    {
+    .modal-dialog {
         max-width: 100%;
         position: relative;
         width: auto;
@@ -783,16 +853,13 @@
         pointer-events: none;
     }
 
-    @media (min-width: 576px)
-    {
-        .modal-dialog
-        {
+    @media (min-width: 576px) {
+        .modal-dialog {
             margin: 1.75rem auto;
         }
     }
 
-    .modal
-    {
+    .modal {
         position: fixed;
         top: 0;
         left: 0;
@@ -804,91 +871,75 @@
         outline: 0;
     }
 
-    .auto-data
-    {
+    .auto-data {
         text-align: center;
         width: 100%;
     }
 
-    .tuning-info
-    {
+    .tuning-info {
         margin-top: 20px; /* Optional margin for overall tuning info */
     }
 
-    .tuning-row
-    {
+    .tuning-row {
         display: flex;
         flex-wrap: wrap; /* Allow cards to wrap into the next line */
         justify-content: space-between; /* Space out the cards evenly */
     }
 
-    .tuning-card
-    {
+    .tuning-card {
         flex: 0 1 calc(50% - 20px); /* Two cards per row with space between */
         margin-bottom: 20px; /* Space between rows */
     }
 
-    .card
-    {
+    .card {
         /* Add any additional styles for the card here */
     }
 
-    .underline-header
-    {
+    .underline-header {
         text-decoration: underline; /* Underline the typeName */
     }
 
-    .card
-    {
+    .card {
         margin: 20px auto;
         max-width: 100em;
     }
 
-    .items-grid
-    {
+    .items-grid {
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
     }
 
-    .item
-    {
+    .item {
         transition: transform 0.3s;
     }
 
-        .item:hover
-        {
+        .item:hover {
             transform: scale(1.05);
         }
 
-    .brand-icon, .model-icon
-    {
+    .brand-icon, .model-icon {
         width: 120px; /* Adjust size as needed */
         height: auto;
     }
 
-    .tuning-section
-    {
+    .tuning-section {
         margin-top: 20px;
     }
 
-        .tuning-section h6
-        {
+        .tuning-section h6 {
             margin-bottom: 10px;
         }
 
-    .petrol-diesel
-    {
+    .petrol-diesel {
         margin-top: 10px;
     }
 
-        .petrol-diesel h7
-        {
+        .petrol-diesel h7 {
             font-weight: bold;
         }
 
-    .upload-area
-    {
+    .upload-area {
         margin-top: 20px;
         text-align: center;
     }
