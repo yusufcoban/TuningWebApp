@@ -476,7 +476,7 @@
 
                 const apiUrl = import.meta.env.VITE_API_BASE_URL; // API base URL
                 try {
-                    const response = await fetch(`${apiUrl}/api/Tuning/DeleteTuning/${this.deleteTargetId}`, {
+                    const response = await fetch(`${apiUrl}/api/Tuning/DeleteTuningVariant/${this.deleteTargetId}`, {
                         method: 'POST', // Use POST or DELETE based on your API
                         credentials: 'include', // Include cookies or tokens
                     });
