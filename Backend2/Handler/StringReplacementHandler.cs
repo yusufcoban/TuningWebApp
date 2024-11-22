@@ -1,10 +1,8 @@
-﻿using BaseBackend.Controllers;
-
-using Dapper;
+﻿using Dapper;
 
 using System.Data.SqlClient;
 
-namespace YourNamespace.Handler
+namespace TuningWebApp.Handler
 {
     public class StringReplacementHandler
     {
@@ -74,7 +72,7 @@ namespace YourNamespace.Handler
                              _logger.LogError("Solution " + mapping.Name + " step algorithm is effected...");
                         }
                     }
-                    await _myUploadedFileHandler.UpdateUploadedFileStateAsync(MyUploadedFile.Id, 5); // set to finished
+                    await _myUploadedFileHandler.UpdateUploadedFileStateAsync(MyUploadedFile.Id, 5, "Automation did this file..."); // set to finished
                 }
                 // Step 7: Save the modified content back to the file.
                 File.WriteAllBytes(outputFilePath, fileContentBytes);
@@ -85,7 +83,7 @@ namespace YourNamespace.Handler
             else
             {
                 // set lookup 
-                await _myUploadedFileHandler.UpdateUploadedFileStateAsync(MyUploadedFile.Id, 1); // set to auto lookup finished
+                await _myUploadedFileHandler.UpdateUploadedFileStateAsync(MyUploadedFile.Id, 1, "Automation couldn't do this file...Free for tuner"); // set to auto lookup finished
                 return false;
 
             }

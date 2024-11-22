@@ -1,8 +1,10 @@
 using BaseBackend.Controllers;
+
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.OpenApi.Models;
-using YourNamespace.Controllers;
-using YourNamespace.Handler;
+
+using TuningWebApp.Controllers;
+using TuningWebApp.Handler;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Logging.AddConsole();               // Adds console logging, outputs to stdout

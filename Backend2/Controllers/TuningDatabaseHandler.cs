@@ -4,9 +4,9 @@ using Dapper;
 
 using System.Data.SqlClient;
 
-using YourNamespace.Handler;
+using TuningWebApp.Handler;
 
-namespace YourNamespace.Controllers
+namespace TuningWebApp.Controllers
 {
     public class TuningDatabaseHandler
     {
