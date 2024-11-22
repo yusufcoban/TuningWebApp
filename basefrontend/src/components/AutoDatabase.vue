@@ -487,10 +487,8 @@
 
                     // Refresh data or update the UI after successful deletion
                     this.fetchTuningData(this.preselectedModelId);
-                    alert('Item deleted successfully.');
                 } catch (error) {
                     console.error('Error deleting item:', error);
-                    alert('Failed to delete the item.');
                 } finally {
                     this.closeDeleteDialog(); // Close the modal
                 }
