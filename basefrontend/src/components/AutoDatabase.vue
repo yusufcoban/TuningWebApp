@@ -461,7 +461,6 @@
         methods: {
             // Open delete confirmation dialog
             openDeleteDialog(id) {
-                debugger;
                 this.deleteTargetId = id; // Store the ID of the item to delete
                 this.isDeleteModalOpen = true; // Show the modal
             },
@@ -476,9 +475,15 @@
 
                 const apiUrl = import.meta.env.VITE_API_BASE_URL; // API base URL
                 try {
-                    const response = await fetch(`${apiUrl}/api/Tuning/DeleteTuningVariant/${this.deleteTargetId}`, {
+                    const response = await fetch(`${apiUrl}/api/Tuning/DeleteTuningVariant`, {
                         method: 'POST', // Use POST or DELETE based on your API
+                        headers: {
+                            'Content-Type': 'application/json', // Set the content type to JSON
+                        },
                         credentials: 'include', // Include cookies or tokens
+                        body: JSON.stringify({
+                            "input": this.deleteTargetId
+                        }),
                     });
 
                     if (!response.ok) {
