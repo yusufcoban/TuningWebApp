@@ -5,7 +5,8 @@
                 <div class="card-title d-block w-100 m-0">
                     <h4 class="fs-1 text-gray-800 w-bolder mb-6">Upload file</h4>
                     <div class="d-flex align-items-center position-relative my-1 mb-4">
-                        <span class="svg-icon svg-icon-1 position-absolute ms-6">
+                        <spa     * 
+    n class="svg-icon svg-icon-1 position-absolute ms-6">
                             <i class="bi bi-search fs-3 vcentered"></i>
                         </span>
                         <input type="text" v-model="searchTerm" class="form-control form-control-solid w-100 ps-15 py-5 fs-4" placeholder="Search by make">
@@ -46,7 +47,7 @@
         </div>
 
         <span v-if="isAdmin && preselectedModelId!=null && !selectedModel" class="plus-icon" title="Add New Model">
-            <span @click="openModal(preselectedModelId)" class="plus-icon" title="Add New Model" data-bs-toggle="modal" data-bs-target="#addModelModal">
+            <span @click="openModal(1,null,null)" class="plus-icon" title="Add New Model" data-bs-toggle="modal" data-bs-target="#addModelModal">
                 <button class="btn btn-primary mt-4">
                     <font-awesome-icon icon="plus" /> New Variant
                 </button>
@@ -64,7 +65,7 @@
                         <div class="card-header text-left">
                             <h6 class="text-gray-800 w-bolder underline-header">{{ typeName }}</h6>
                             <span v-if="1==1" class="plus-icon" title="Add New Model">
-                                <span @click="openModalByName(typeName)" class="plus-icon" title="Add New Model" data-bs-toggle="modal" data-bs-target="#addModelModal">
+                                <span @click="openModal(2,typeName,null)" class="plus-icon" title="Add New Model" data-bs-toggle="modal" data-bs-target="#addModelModal">
                                     <button v-if="isAdmin" class="btn btn-primary btn-sm">
                                         <font-awesome-icon icon="plus" /> New variant
                                     </button>
@@ -83,6 +84,11 @@
                                             <font-awesome-icon icon="trash-can" />  Delete
                                         </button>
                                     </span>
+                                    <span v-if="isAdmin" @click="openModal(3,typeName,petrol)" class="plus-icon" title="Add New Model" data-bs-toggle="modal" data-bs-target="#addModelModal">
+                                        <button class="btn btn-primary btn-sm">
+                                            <font-awesome-icon icon="trash-can" />  Edit
+                                        </button>
+                                    </span>
                                 </li>
                             </ul>
                             <h7 class="text-gray-800">Diesel Models</h7>
@@ -94,6 +100,12 @@
                                             <font-awesome-icon icon="trash-can" />  Delete
                                         </button>
 
+                                    </span>
+
+                                    <span v-if="isAdmin" @click="openModal(3,typeName,diesel)" class="plus-icon" title="Add New Model" data-bs-toggle="modal" data-bs-target="#addModelModal">
+                                        <button class="btn btn-primary btn-sm">
+                                            <font-awesome-icon icon="trash-can" />  Edit
+                                        </button>
                                     </span>
                                 </li>
                             </ul>
@@ -113,229 +125,6 @@
                             @show-more-details="showMoreDetails"
                             @cancel-upload="cancelUpload" />
 
-
-
-        <Modal v-model="isOpenFromOutside" :fullscreen="false" :clickOut="true" style="margin-left: 10vw;">
-            <div class="modal" tabindex="-1" role="dialog">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content" style="min-width:80em;max-height:60em;">
-                        <div class="modal-header">
-                            <div class="mb-4">
-                                <img :src="getModelByGivenId(preselectedModelId).icon" class="brand-icon" style="width: 50px; height: auto;">
-                            </div>
-                            <h5 class="modal-title">{{ getModelByGivenId(preselectedModelId)?.name }}</h5>
-                            <button type="button" class="close" @click="close_Modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <form @submit.prevent="submitForm">
-                                <h4 class="mb-3">General Infos</h4>
-                                <div class="row mb-4">
-                                    <div class="col-xs-6 form-group">
-                                        <label for="typeName">Model Name</label>
-                                        <input type="text" id="typeName" v-model="formData.typeName" class="form-control" required>
-                                    </div>
-                                </div>
-                                <div class="row mb-4">
-                                    <div class="col-xs-6 form-group">
-                                        <label for="yearStart">Year Start</label>
-                                        <input type="number" id="yearStart" v-model="formData.yearStart" class="form-control" required>
-                                    </div>
-                                    <div class="col-xs-6 form-group">
-                                        <label for="yearEnd">Year End</label>
-                                        <input type="number" id="yearEnd" v-model="formData.yearEnd" class="form-control" required>
-                                    </div>
-                                </div>
-                                <div class="row mb-4">
-                                    <div class="col-xs-6 form-group">
-                                        <label for="engineName">Engine Name</label>
-                                        <input type="text" id="engineName" v-model="formData.engineName" class="form-control" required>
-                                    </div>
-                                    <div class="col-xs-6 form-group">
-                                        <label for="enginePowerKw">Engine Power (kW)</label>
-                                        <input type="number" id="enginePowerKw" v-model="formData.enginePowerKw" class="form-control" required>
-                                    </div>
-                                </div>
-                                <div class="row mb-8">
-                                    <div class="col-xs-4 form-group">
-                                        <label for="fuelVariant">Fuel Variant</label>
-                                        <select id="fuelVariant" v-model="formData.fuelVariant" class="form-control" required>
-                                            <option value="petrol">Petrol</option>
-                                            <option value="diesel">Diesel</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-xs-4 form-group">
-                                        <label for="ecuSelect">Select ECU</label>
-                                        <select id="ecuSelect" v-model="formData.selectedEcu.id" class="form-control" required>
-                                            <option value="" disabled>Select ECU</option>
-                                            <option v-for="ecu in ecuList" :key="ecu.id" :value="ecu.id">
-                                                {{ ecu.ecuName }}
-                                            </option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="specialInfo">Special Info</label>
-                                    <textarea id="specialInfo" v-model="formData.specialInfo" class="form-control" rows="5" placeholder="Enter any additional details here..."></textarea>
-                                </div>
-
-                                <h4 class="mt-4">Options</h4>
-                                <div v-for="(item, index) in checkableItems" :key="index" class="form-check mb-2">
-                                    <input type="checkbox"
-                                           :id="item.id"
-                                           class="form-check-input"
-                                           v-model="item.checked"
-                                           @change="updateAvailableSolutions()">
-                                    <label :for="item.id" class="form-check-label">{{ item.label }}</label>
-
-                                    <!-- Show values only if showValues is true -->
-                                    <div v-if="item.showValues && item.checked" class="mt-2">
-                                        <label>{{ item.textValue1 }}</label>
-                                        <input type="number"
-                                               v-model="item.value1"
-                                               class="form-control"
-                                               placeholder="Value 1" />
-                                        <label class="mt-2">{{ item.textValue2 }}</label>
-                                        <input type="number"
-                                               v-model="item.value2"
-                                               class="form-control"
-                                               placeholder="Value 2" />
-                                    </div>
-                                </div>
-                                <button type="submit" class="btn btn-primary mt-4">Submit</button>
-                            </form>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" @click="close_Modal">Close</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </Modal>
-
-
-        <Modal v-model="isOpenFromOutsideModel" :fullscreen="false" :clickOut="true" style="margin-left: 5vw;">
-            <div class="modal" tabindex="-1" role="dialog">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content" style="min-width: 80em; max-height: 60em;">
-                        <!-- Match the first modal's min-width -->
-                        <div class="modal-header">
-                            <div class="mb-4">
-                                <img :src="getModelByGivenId(preselectedModelId).icon" class="brand-icon" style="width: 50px; height: auto;">
-                            </div>
-                            <div>
-                                <h4 class="modal-title">{{ getModelByGivenId(preselectedModelId)?.name }}</h4>
-                                <h6 class="modal-title">{{ preselectedtypeName }}</h6>
-                            </div>
-                            <button type="button" class="close" @click="close_Modal_Model" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <form @submit.prevent="submitForm">
-                                <h4 class="mb-3">General Infos</h4>
-                                <div class="row mb-4">
-                                    <div class="col-xs-6 form-group">
-                                        <label for="typeName">Model Name</label>
-                                        <input type="text" id="typeName" v-model="formData.typeName" class="form-control" required>
-                                    </div>
-                                </div>
-                                <div class="row mb-4">
-                                    <div class="col-xs-6 form-group">
-                                        <label for="yearStart">Year Start</label>
-                                        <input type="number" id="yearStart" v-model="formData.yearStart" class="form-control" required>
-                                    </div>
-                                    <div class="col-xs-6 form-group">
-                                        <label for="yearEnd">Year End</label>
-                                        <input type="number" id="yearEnd" v-model="formData.yearEnd" class="form-control" required>
-                                    </div>
-                                </div>
-                                <div class="row mb-4">
-                                    <div class="col-xs-6 form-group">
-                                        <label for="engineName">Engine Name</label>
-                                        <input type="text" id="engineName" v-model="formData.engineName" class="form-control" required>
-                                    </div>
-                                    <div class="col-xs-6 form-group">
-                                        <label for="enginePowerKw">Engine Power (kW)</label>
-                                        <input type="number" id="enginePowerKw" v-model="formData.enginePowerKw" class="form-control" required>
-                                    </div>
-                                </div>
-                                <div class="row mb-8">
-                                    <div class="col-xs-4 form-group">
-                                        <label for="fuelVariant">Fuel Variant</label>
-                                        199<select id="fuelVariant" v-model="formData.fuelVariant" class="form-control" required>
-                                            <option value="petrol">Petrol</option>
-                                            <option value="diesel">Diesel</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-xs-4 form-group">
-                                        <label for="ecuSelect">Select ECU</label>
-                                        <select id="ecuSelect" v-model="formData.selectedEcu.id" class="form-control" required>
-                                            <option value="" disabled>Select ECU</option>
-                                            <option v-for="ecu in ecuList" :key="ecu.Id" :value="ecu.Id">
-                                                {{ ecu.ecuName }}
-                                            </option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="specialInfo">Special Info</label>
-                                    <textarea id="specialInfo" v-model="formData.specialInfo" class="form-control" rows="5" placeholder="Enter any additional details here..."></textarea>
-                                </div>
-
-                                <h4 class="mt-4">Options</h4>
-                                <div v-for="(item, index) in checkableItems" :key="index" class="form-check mb-2">
-                                    <input type="checkbox"
-                                           :id="item.id"
-                                           class="form-check-input"
-                                           v-model="item.checked"
-                                           @change="updateAvailableSolutions()">
-                                    <label :for="item.id" class="form-check-label">{{ item.label }}</label>
-
-                                    <!-- Show values only if showValues is true -->
-                                    <div v-if="item.showValues && item.checked" class="mt-2">
-                                        <label>{{ item.textValue1 }}</label>
-                                        <input type="number"
-                                               v-model="item.value1"
-                                               class="form-control"
-                                               placeholder="Value 1" />
-                                        <label class="mt-2">{{ item.textValue2 }}</label>
-                                        <input type="number"
-                                               v-model="item.value2"
-                                               class="form-control"
-                                               placeholder="Value 2" />
-                                    </div>
-
-                                    <div v-if="item.checked" class="mt-2 ml-4">
-                                        <div v-for="(line, lineIndex) in item.replacementLines" :key="lineIndex" class="replacement-line mb-2">
-                                            <label>Search String:</label>
-                                            <input type="text" v-model="line.searchString" class="form-control mb-1" placeholder="Enter search string" />
-
-                                            <label>Replacement String:</label>
-                                            <input type="text" v-model="line.replacementString" class="form-control mb-1" placeholder="Enter replacement string" />
-
-                                            <label>Threshold:</label>
-                                            <input type="number" v-model="line.number" class="form-control mb-1" placeholder="Enter threshold (0-100)" />
-
-                                            <!-- Remove line button -->
-                                            <button type="button" class="btn btn-danger" @click="removeReplacementLine(item, lineIndex)">Remove Line</button>
-                                        </div>
-
-                                        <button type="button" class="btn btn-secondary mb-2" @click="addReplacementLine(item)">Add Replacement Line</button>
-                                    </div>
-                                </div>
-
-                                <button type="submit" class="btn btn-primary mt-4">Submit</button>
-                            </form>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" @click="close_Modal_Model">Close</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </Modal>
 
 
         <Modal v-model="isDeleteModalOpen" :fullscreen="false" :clickOut="true" style="margin-left: 5vw;">
@@ -367,14 +156,15 @@
             <button @click="openModal(3)" class="btn btn-danger">Open Modal (State 3)</button>
 
             <!-- Modal Component -->
-            <AddEditTuningVariantModal :isOpen="isModalOpen"
-                         :state="modalState"
-                         :preselectedModelId="selectedModelId"
-                         :preselectedtypeName="selectedTypeName"
-                         :ecuList="ecuList"
-                         :checkableItems="checkableItems"
-                         @update:isOpen="closeModal"
-                         @submit="handleSubmit" />
+            <AddEditTuningVariantModal :isOpen="true"
+                                       :state="modalState"
+                                       :typename="selectedTypeName"
+                                       :carbrand="selectedMake"
+                                       :model="selectedModelModal"
+                                       :ecuList="ecuList"
+                                       :checkableItems="checkableItems"
+                                       @update:isOpen="closeModal"
+                                       @submit="handleSubmit" />
         </div>
     </div>
 </template>
@@ -385,13 +175,16 @@
     import AvailableSolutions from './AvailableSolutions.vue';
     import { mapState } from 'vuex'; // Import mapState for accessing Vuex state
     import { Modal } from 'vue-neat-modal'
-    import AddEditTuningVariantModal from "./AddEditTuningVariantModal.vue"; // Import the modal component
+    import AddEditTuningVariantModal from "./AddEditTuningVariantModal.vue"; // Import the modal component    
+
 
     export default {
         data() {
             return {
                 searchTerm: "",
+                selectedModelModal: {},
                 selectedMake: null,
+                selectedTypeName: '',
                 tuningInfo: null,
                 selectedModel: null,
                 availableSolutions: [],
@@ -680,15 +473,21 @@
                 }
 
             },
-            openModal(types) {
-                this.open_Modal();
-                //CarBrand => Add new Model Golf 9
-                console.log(types)
+            openModal(state, typename, model) {
+                // Open the modal with the given state
+                this.selectedModelModal = model;
+                this.selectedTypeName = typename;
+                this.modalState = state;
+                this.isModalOpen = true;
             },
-            openModalByName(typeName) {
-                this.preselectedtypeName = typeName;
-                this.open_Modal_Model();
-                //Here i got typeName already....open modal with given typeName
+            closeModal() {
+                // Close the modal
+                this.isModalOpen = false;
+            },
+            handleSubmit(formData) {
+                // Handle form submission from the modal
+                console.log("Form Submitted with Data:", formData);
+                this.closeModal();
             },
             async fetchCarBrands() {
                 this.isLoading = true; // Set loading to true
@@ -862,12 +661,14 @@
 
 
 <style scoped>
-    .modal-body {
+    .modal-body
+    {
         overflow-y: scroll;
         height: 1050px
     }
 
-    .modal-dialog {
+    .modal-dialog
+    {
         max-width: 100%;
         position: relative;
         width: auto;
@@ -875,13 +676,16 @@
         pointer-events: none;
     }
 
-    @media (min-width: 576px) {
-        .modal-dialog {
+    @media (min-width: 576px)
+    {
+        .modal-dialog
+        {
             margin: 1.75rem auto;
         }
     }
 
-    .modal {
+    .modal
+    {
         position: fixed;
         top: 0;
         left: 0;
@@ -893,75 +697,91 @@
         outline: 0;
     }
 
-    .auto-data {
+    .auto-data
+    {
         text-align: center;
         width: 100%;
     }
 
-    .tuning-info {
+    .tuning-info
+    {
         margin-top: 20px; /* Optional margin for overall tuning info */
     }
 
-    .tuning-row {
+    .tuning-row
+    {
         display: flex;
         flex-wrap: wrap; /* Allow cards to wrap into the next line */
         justify-content: space-between; /* Space out the cards evenly */
     }
 
-    .tuning-card {
+    .tuning-card
+    {
         flex: 0 1 calc(50% - 20px); /* Two cards per row with space between */
         margin-bottom: 20px; /* Space between rows */
     }
 
-    .card {
+    .card
+    {
         /* Add any additional styles for the card here */
     }
 
-    .underline-header {
+    .underline-header
+    {
         text-decoration: underline; /* Underline the typeName */
     }
 
-    .card {
+    .card
+    {
         margin: 20px auto;
         max-width: 100em;
     }
 
-    .items-grid {
+    .items-grid
+    {
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
     }
 
-    .item {
+    .item
+    {
         transition: transform 0.3s;
     }
 
-        .item:hover {
+        .item:hover
+        {
             transform: scale(1.05);
         }
 
-    .brand-icon, .model-icon {
+    .brand-icon, .model-icon
+    {
         width: 120px; /* Adjust size as needed */
         height: auto;
     }
 
-    .tuning-section {
+    .tuning-section
+    {
         margin-top: 20px;
     }
 
-        .tuning-section h6 {
+        .tuning-section h6
+        {
             margin-bottom: 10px;
         }
 
-    .petrol-diesel {
+    .petrol-diesel
+    {
         margin-top: 10px;
     }
 
-        .petrol-diesel h7 {
+        .petrol-diesel h7
+        {
             font-weight: bold;
         }
 
-    .upload-area {
+    .upload-area
+    {
         margin-top: 20px;
         text-align: center;
     }
