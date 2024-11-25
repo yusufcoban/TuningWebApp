@@ -126,7 +126,7 @@
 
 
 
-        <Modal v-model="isDeleteModalOpen" :fullscreen="false" :clickOut="true" style="margin-left: 5vw;">
+        <VueFinalModal v-model="isDeleteModalOpen" :fullscreen="false" :clickOut="true" style="margin-left: 5vw;">
             <div class="modal" tabindex="-1" role="dialog">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content" style="min-width: 30em; max-height: 20em;">
@@ -146,14 +146,9 @@
                     </div>
                 </div>
             </div>
-        </Modal>
+        </VueFinalModal>
 
         <div>
-            <!-- Buttons to Open the Modal with Different States -->
-            <button @click="openModal(1)" class="btn btn-primary">Open Modal (State 1)</button>
-            <button @click="openModal(2)" class="btn btn-success">Open Modal (State 2)</button>
-            <button @click="openModal(3)" class="btn btn-danger">Open Modal (State 3)</button>
-
             <!-- Modal Component -->
             <AddEditTuningVariantModal v-if="isModalOpen" 
                                        :state="modalState"
@@ -172,7 +167,7 @@
     import { imagelogosolutions } from './carbrands'; // Import the car brands and tuning data
     import AvailableSolutions from './AvailableSolutions.vue';
     import { mapState } from 'vuex'; // Import mapState for accessing Vuex state
-    import { Modal } from 'vue-neat-modal'
+    import { VueFinalModal } from 'vue-final-modal'
     import AddEditTuningVariantModal from "./AddEditTuningVariantModal.vue"; // Import the modal component    
 
 
@@ -211,7 +206,7 @@
         },
         components: {
             AvailableSolutions,
-            Modal,
+            VueFinalModal,
             AddEditTuningVariantModal
         }, mounted() {
             this.fetchCarBrands(); // Call fetch method on mount
