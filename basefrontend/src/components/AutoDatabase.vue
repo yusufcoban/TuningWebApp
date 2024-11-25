@@ -70,7 +70,7 @@
                                     </button>
 
                                 </span>
-                                
+
                             </span>
                         </div>
                         <div class="card-body">
@@ -359,6 +359,23 @@
                 </div>
             </div>
         </Modal>
+
+        <div>
+            <!-- Buttons to Open the Modal with Different States -->
+            <button @click="openModal(1)" class="btn btn-primary">Open Modal (State 1)</button>
+            <button @click="openModal(2)" class="btn btn-success">Open Modal (State 2)</button>
+            <button @click="openModal(3)" class="btn btn-danger">Open Modal (State 3)</button>
+
+            <!-- Modal Component -->
+            <AddEditTuningVariantModal :isOpen="isModalOpen"
+                         :state="modalState"
+                         :preselectedModelId="selectedModelId"
+                         :preselectedtypeName="selectedTypeName"
+                         :ecuList="ecuList"
+                         :checkableItems="checkableItems"
+                         @update:isOpen="closeModal"
+                         @submit="handleSubmit" />
+        </div>
     </div>
 </template>
 
@@ -368,6 +385,7 @@
     import AvailableSolutions from './AvailableSolutions.vue';
     import { mapState } from 'vuex'; // Import mapState for accessing Vuex state
     import { Modal } from 'vue-neat-modal'
+    import AddEditTuningVariantModal from "./AddEditTuningVariantModal.vue"; // Import the modal component
 
     export default {
         data() {
@@ -423,7 +441,8 @@
         },
         components: {
             AvailableSolutions,
-            Modal
+            Modal,
+            AddEditTuningVariantModal
         }, mounted() {
             this.fetchCarBrands(); // Call fetch method on mount
             this.getEcuListBackend();
