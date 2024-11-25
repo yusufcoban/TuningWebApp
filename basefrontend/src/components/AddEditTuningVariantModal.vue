@@ -1,18 +1,21 @@
 <template>
     <div>
-        <VueFinalModal v-model="triggerModal" :fullscreen="false" :clickOut="true" class="miskte" :style="{ marginLeft: state === 1 ? '10vw' : '5vw' }">
+        <VueFinalModal v-model="triggerModal"
+                       :fullscreen="false"
+                       :clickOut="true"
+                       class="miskte"
+                       :style="{ marginLeft: state === 1 ? '10vw' : '5vw' }">
             <div class="modal" tabindex="-1" role="dialog">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content" style="min-width: 80em; max-height: 60em;">
                         <div class="modal-header">
                             <div class="mb-4">
-                                <img src="https://media.istockphoto.com/id/1530149386/vector/no-image-vector-symbol-missing-available-icon-no-gallery-for-this-moment-placeholder.jpg?s=612x612&w=0&k=20&c=eQigJzI4AfNB0kGNu1k5Owy_FGro1ApIki0HfOVJD2s=" class="brand-icon" style="width: 50px; height: auto;">
+                                <img :src="carbrand.icon" class="brand-icon" style="width: 50px; height: auto;" />
                             </div>
                             <div v-if="state === 2 || state === 3">
-                                <h4 class="modal-title">{{ model }}</h4>
-                                <h6 v-if="state === 2 || state === 3" class="modal-title">  </h6>
+                                <h4 class="modal-title">{{ formData.typeName }}</h4>
                             </div>
-                            <h5 v-else class="modal-title">{{ carbrand }}</h5>
+                            <h5 v-else class="modal-title">{{ carbrand.name }}</h5>
                             <button type="button" class="close" @click="closeModal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -23,97 +26,39 @@
                                 <div class="row mb-4">
                                     <div class="col-xs-6 form-group">
                                         <label for="typeName">Model Name</label>
-                                        <input type="text" id="typeName" v-model="formData.typeName" class="form-control" required>
+                                        <input type="text" id="typeName" v-model="formData.typeName" class="form-control" required />
                                     </div>
                                 </div>
                                 <div class="row mb-4">
                                     <div class="col-xs-6 form-group">
                                         <label for="yearStart">Year Start</label>
-                                        <input type="number" id="yearStart" v-model="formData.yearStart" class="form-control" required>
+                                        <input type="number" id="yearStart" v-model="formData.yearStart" class="form-control" required />
                                     </div>
                                     <div class="col-xs-6 form-group">
                                         <label for="yearEnd">Year End</label>
-                                        <input type="number" id="yearEnd" v-model="formData.yearEnd" class="form-control" required>
+                                        <input type="number" id="yearEnd" v-model="formData.yearEnd" class="form-control" required />
                                     </div>
                                 </div>
                                 <div class="row mb-4">
                                     <div class="col-xs-6 form-group">
                                         <label for="engineName">Engine Name</label>
-                                        <input type="text" id="engineName" v-model="formData.engineName" class="form-control" required>
+                                        <input type="text" id="engineName" v-model="formData.engineName" class="form-control" required />
                                     </div>
                                     <div class="col-xs-6 form-group">
                                         <label for="enginePowerKw">Engine Power (kW)</label>
-                                        <input type="number" id="enginePowerKw" v-model="formData.enginePowerKw" class="form-control" required>
-                                    </div>
-                                </div>
-                                <div class="row mb-8">
-                                    <div class="col-xs-4 form-group">
-                                        <label for="fuelVariant">Fuel Variant</label>
-                                        <select id="fuelVariant" v-model="formData.fuelVariant" class="form-control" required>
-                                            <option value="petrol">Petrol</option>
-                                            <option value="diesel">Diesel</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-xs-4 form-group">
-                                        <label for="ecuSelect">Select ECU</label>
-                                        <select id="ecuSelect" v-model="formData.selectedEcu.id" class="form-control" required>
-                                            <option value="" disabled>Select ECU</option>
-                                            <option v-for="ecu in ecuList" :key="ecu.id" :value="ecu.id">
-                                                {{ ecu.ecuName }}
-                                            </option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="specialInfo">Special Info</label>
-                                    <textarea id="specialInfo" v-model="formData.specialInfo" class="form-control" rows="5" placeholder="Enter any additional details here..."></textarea>
-                                </div>
-
-                                <h4 class="mt-4">Options</h4>
-                                <div v-for="(item, index) in checkableItems" :key="index" class="form-check mb-2">
-                                    <input type="checkbox" :id="item.id" class="form-check-input" v-model="item.checked" @change="updateAvailableSolutions()">
-                                    <label :for="item.id" class="form-check-label">{{ item.label }}</label>
-                                    <!-- Dynamic content for options -->
-                                    <div v-if="item.checked">
-                                        <div v-if="state === 3" class="mt-2 ml-4">
-                                            <div v-for="(line, lineIndex) in item.replacementLines" :key="lineIndex" class="replacement-line mb-2">
-                                                <label>Search String:</label>
-                                                <input type="text" v-model="line.searchString" class="form-control mb-1" placeholder="Enter search string" />
-
-                                                <label>Replacement String:</label>
-                                                <input type="text" v-model="line.replacementString" class="form-control mb-1" placeholder="Enter replacement string" />
-
-                                                <label>Threshold:</label>
-                                                <input type="number" v-model="line.number" class="form-control mb-1" placeholder="Enter threshold (0-100)" />
-
-                                                <!-- Remove line button -->
-                                                <button type="button" class="btn btn-danger" @click="removeReplacementLine(item, lineIndex)">Remove Line</button>
-                                            </div>
-
-                                            <button type="button" class="btn btn-secondary mb-2" @click="addReplacementLine(item)">Add Replacement Line</button>
-                                        </div>
-                                        <div v-else-if="item.showValues" class="mt-2">
-                                            <label>{{ item.textValue1 }}</label>
-                                            <input type="number" v-model="item.value1" class="form-control" placeholder="Value 1" />
-                                            <label class="mt-2">{{ item.textValue2 }}</label>
-                                            <input type="number" v-model="item.value2" class="form-control" placeholder="Value 2" />
-                                        </div>
+                                        <input type="number" id="enginePowerKw" v-model="formData.enginePowerKw" class="form-control" required />
                                     </div>
                                 </div>
                                 <button type="submit" class="btn btn-primary mt-4">Submit</button>
                             </form>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" @click="closeModal">Close</button>
-                        </div>
                     </div>
                 </div>
             </div>
         </VueFinalModal>
-
     </div>
-
 </template>
+
 
 <script>
     import { VueFinalModal } from 'vue-final-modal'
@@ -134,44 +79,40 @@ state3 => edit on existing one
         data() {
             return {
                 triggerModal: false,
+
                 formData: {
-                    typeName: "",
-                    yearStart: null,
-                    yearEnd: null,
-                    engineName: "",
-                    enginePowerKw: null,
-                    fuelVariant: "petrol",
-                    selectedEcu: { id: "" },
-                    specialInfo: "",
-                    formData: {
-                        "carBrand": {
-                            "id": this.preselectedModelId
-                        },
-                        yearStart: 2020,
-                        yearEnd: 2020,
-                        engineName: '',
-                        enginePowerKw: 0,
-                        fuelVariant: '',
-                        typeName: '',
-                        specialInfo: '',
-                        selectedEcu: { id: null },
-                        availableSolutions: [],
-                        checkableItems: [
-                            { id: 'egr', label: 'egr', checked: false, showValues: false, value1: 0, value2: 0, replacementLines: [] },
-                            { id: 'adblue', label: 'adblue', checked: false, showValues: false, value1: 0, value2: 0, replacementLines: [] },
-                            { id: 'stage1', label: 'stage1', checked: false, showValues: true, value1: 0, value2: 0, textValue1: 'Enter increase in kW', textValue2: 'Enter increase in NM', replacementLines: [] },
-                            { id: 'stage2', label: 'stage2', checked: false, showValues: true, value1: 0, value2: 0, textValue1: 'Enter increase in kW', textValue2: 'Enter increase in NM', replacementLines: [] },
-                            { id: 'dtc', label: 'dtc', checked: false, showValues: false, value1: 0, value2: 0, replacementLines: [] },
-                            { id: 'flaps', label: 'flaps', checked: false, showValues: false, value1: 0, value2: 0, replacementLines: [] },
-                        ],
+                    "carBrand": {
+                        "id": 0
                     },
+                    yearStart: 2020,
+                    yearEnd: 2020,
+                    engineName: '',
+                    enginePowerKw: 0,
+                    fuelVariant: '',
+                    typeName: '',
+                    specialInfo: '',
+                    selectedEcu: { id: null },
+                    availableSolutions: [],
+                    checkableItems: [
+                        { id: 'egr', label: 'egr', checked: false, showValues: false, value1: 0, value2: 0, replacementLines: [] },
+                        { id: 'adblue', label: 'adblue', checked: false, showValues: false, value1: 0, value2: 0, replacementLines: [] },
+                        { id: 'stage1', label: 'stage1', checked: false, showValues: true, value1: 0, value2: 0, textValue1: 'Enter increase in kW', textValue2: 'Enter increase in NM', replacementLines: [] },
+                        { id: 'stage2', label: 'stage2', checked: false, showValues: true, value1: 0, value2: 0, textValue1: 'Enter increase in kW', textValue2: 'Enter increase in NM', replacementLines: [] },
+                        { id: 'dtc', label: 'dtc', checked: false, showValues: false, value1: 0, value2: 0, replacementLines: [] },
+                        { id: 'flaps', label: 'flaps', checked: false, showValues: false, value1: 0, value2: 0, replacementLines: [] },
+                    ]
                 },
             };
         },
         components: {
-            VueFinalModal 
+            VueFinalModal
+        },
+        computed: {
         },
         methods: {
+            setYears(startYear, endYear) {
+                this.model.year = `${startYear}-${endYear}`;
+            },
             closeModal() {
                 this.$emit("closemodal", false);
             },
@@ -287,6 +228,45 @@ state3 => edit on existing one
             },
         },
         mounted() {
+            if (this.state === 1 || this.state === 2) {
+                this.formData = {
+                    ...this.formData, // Preserve checkableItems structure
+                    typeName: "",
+                    yearStart: null,
+                    yearEnd: null,
+                    engineName: "",
+                    enginePowerKw: null,
+                    fuelVariant: "petrol",
+                    selectedEcu: { id: "" },
+                    specialInfo: "",
+                    availableSolutions: [],
+                };
+
+                if (this.state === 2) {
+                    this.formData.typeName = this.typename;
+                    //this.formData.typeName= this.model.typeName;
+                }
+            } else if (this.state === 3 && this.model) {
+                console.log(this.model);
+                this.formData = {
+                    ...this.formData, // Preserve checkableItems structure
+                    typeName: this.model.typeName || "",
+                    yearStart: parseInt(this.model.year.split("-")[0], 10) || null,
+                    yearEnd: parseInt(this.model.year.split("-")[1], 10) || null,
+                    engineName: this.model.engine || "",
+                    enginePowerKw: parseInt(this.model.horsepower, 10) || null,
+                    fuelVariant: this.model.variant || "petrol",
+                    selectedEcu: { id: "" }, // Populate this based on your requirements
+                    specialInfo: "",
+                    availableSolutions: [],
+                };
+
+
+                //get selected ecu from backend
+                //get replacementscripts and solutions from backend
+            }
+
+            this.formData.carBrand = this.carbrand.id;
             this.triggerModal = true;
         }
     };
