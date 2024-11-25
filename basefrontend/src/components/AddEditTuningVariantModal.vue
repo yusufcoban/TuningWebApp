@@ -1,11 +1,11 @@
 <template>
-    <Modal v-if="isOpen" :fullscreen="false" :clickOut="true" :style="{ marginLeft: state === 1 ? '10vw' : '5vw' }">
+    <Modal v-if ="triggerModal" :fullscreen="false" :clickOut="true" class="miskte" :style="{ marginLeft: state === 1 ? '10vw' : '5vw' }">
         <div class="modal" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document">
                 <div class="modal-content" style="min-width: 80em; max-height: 60em;">
                     <div class="modal-header">
                         <div class="mb-4">
-                            <img :src="getModelByGivenId(preselectedModelId).icon" class="brand-icon" style="width: 50px; height: auto;">
+                            <img src="https://media.istockphoto.com/id/1530149386/vector/no-image-vector-symbol-missing-available-icon-no-gallery-for-this-moment-placeholder.jpg?s=612x612&w=0&k=20&c=eQigJzI4AfNB0kGNu1k5Owy_FGro1ApIki0HfOVJD2s=" class="brand-icon" style="width: 50px; height: auto;">
                         </div>
                         <div v-if="state === 2 || state === 3">
                             <h4 class="modal-title">{{ model }}</h4>
@@ -108,7 +108,7 @@
                 </div>
             </div>
         </div>
-    </Modal>
+        </Modal>
 </template>
 
 <script>
@@ -120,16 +120,15 @@ state3 => edit on existing one
 */
     export default {
         props: {
-            isOpen: Boolean,
             state: Number, // 1, 2, or 3 to control modal behavior
             model: Array,
             carbrand: Array,
             typename: String,
-            ecuList: Array,
-            checkableItems: Array,
+            ecuList: Array
         },
         data() {
             return {
+                triggerModal: false,
                 formData: {
                     typeName: "",
                     yearStart: null,
@@ -151,7 +150,15 @@ state3 => edit on existing one
                         typeName: '',
                         specialInfo: '',
                         selectedEcu: { id: null },
-                        availableSolutions: []
+                        availableSolutions: [],
+                        checkableItems: [
+                            { id: 'egr', label: 'egr', checked: false, showValues: false, value1: 0, value2: 0, replacementLines: [] },
+                            { id: 'adblue', label: 'adblue', checked: false, showValues: false, value1: 0, value2: 0, replacementLines: [] },
+                            { id: 'stage1', label: 'stage1', checked: false, showValues: true, value1: 0, value2: 0, textValue1: 'Enter increase in kW', textValue2: 'Enter increase in NM', replacementLines: [] },
+                            { id: 'stage2', label: 'stage2', checked: false, showValues: true, value1: 0, value2: 0, textValue1: 'Enter increase in kW', textValue2: 'Enter increase in NM', replacementLines: [] },
+                            { id: 'dtc', label: 'dtc', checked: false, showValues: false, value1: 0, value2: 0, replacementLines: [] },
+                            { id: 'flaps', label: 'flaps', checked: false, showValues: false, value1: 0, value2: 0, replacementLines: [] },
+                        ],
                     },
                 },
             };
@@ -161,7 +168,7 @@ state3 => edit on existing one
         },
         methods: {
             closeModal() {
-                this.$emit("update:isOpen", false);
+                this.$emit("closemodal", false);
             },
             submitForm() {
                 this.$emit("submit", this.formData);
@@ -274,5 +281,8 @@ state3 => edit on existing one
 
             },
         },
+        mounted() {
+            this.triggerModal = true;
+        }
     };
 </script>

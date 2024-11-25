@@ -5,8 +5,7 @@
                 <div class="card-title d-block w-100 m-0">
                     <h4 class="fs-1 text-gray-800 w-bolder mb-6">Upload file</h4>
                     <div class="d-flex align-items-center position-relative my-1 mb-4">
-                        <spa     * 
-    n class="svg-icon svg-icon-1 position-absolute ms-6">
+                        <span class="svg-icon svg-icon-1 position-absolute ms-6">
                             <i class="bi bi-search fs-3 vcentered"></i>
                         </span>
                         <input type="text" v-model="searchTerm" class="form-control form-control-solid w-100 ps-15 py-5 fs-4" placeholder="Search by make">
@@ -156,14 +155,13 @@
             <button @click="openModal(3)" class="btn btn-danger">Open Modal (State 3)</button>
 
             <!-- Modal Component -->
-            <AddEditTuningVariantModal :isOpen="true"
+            <AddEditTuningVariantModal v-if="isModalOpen" 
                                        :state="modalState"
                                        :typename="selectedTypeName"
                                        :carbrand="selectedMake"
                                        :model="selectedModelModal"
                                        :ecuList="ecuList"
-                                       :checkableItems="checkableItems"
-                                       @update:isOpen="closeModal"
+                                       @closemodal="closeModal"
                                        @submit="handleSubmit" />
         </div>
     </div>
@@ -201,28 +199,7 @@
                 isOpenFromOutside: false,
                 isOpenFromOutsideModel: false,
                 isUploading: false,
-                formData: {
-                    "carBrand": {
-                        "id": this.preselectedModelId
-                    },
-                    yearStart: 2020,
-                    yearEnd: 2020,
-                    engineName: '',
-                    enginePowerKw: 0,
-                    fuelVariant: '',
-                    typeName: '',
-                    specialInfo: '',
-                    selectedEcu: { id: null },
-                    availableSolutions: []
-                },
-                checkableItems: [
-                    { id: 'egr', label: 'egr', checked: false, showValues: false, value1: 0, value2: 0, replacementLines: [] },
-                    { id: 'adblue', label: 'adblue', checked: false, showValues: false, value1: 0, value2: 0, replacementLines: [] },
-                    { id: 'stage1', label: 'stage1', checked: false, showValues: true, value1: 0, value2: 0, textValue1: 'Enter increase in kW', textValue2: 'Enter increase in NM', replacementLines: [] },
-                    { id: 'stage2', label: 'stage2', checked: false, showValues: true, value1: 0, value2: 0, textValue1: 'Enter increase in kW', textValue2: 'Enter increase in NM', replacementLines: [] },
-                    { id: 'dtc', label: 'dtc', checked: false, showValues: false, value1: 0, value2: 0, replacementLines: [] },
-                    { id: 'flaps', label: 'flaps', checked: false, showValues: false, value1: 0, value2: 0, replacementLines: [] },
-                ],
+                isModalOpen:false,
                 ecuList: [
                     { Id: 1, EcuName: "MED17.7", ConnectionInfoId: 12 },
                     { Id: 2, EcuName: "MED17.8", ConnectionInfoId: 13 },
@@ -310,23 +287,6 @@
                     this.closeDeleteDialog(); // Close the modal
                 }
             },
-            toggleReplacementArea(item) {
-                if (!item.checked) {
-                    item.replacementLines = []; // Clear lines if unchecked
-                }
-            },
-            // Method to add a new replacement line
-            addReplacementLine(item) {
-                item.replacementLines.push({
-                    searchString: '',
-                    replacementString: '',
-                    number: null,
-                });
-            },
-            // Method to remove a specific replacement line
-            removeReplacementLine(item, lineIndex) {
-                item.replacementLines.splice(lineIndex, 1);
-            },
             async getEcuListBackend() {
                 this.ecuList = [];
                 const apiUrl = import.meta.env.VITE_API_BASE_URL; // Get base URL from environment variables
@@ -353,28 +313,6 @@
                 } finally {
                     this.isLoading = false; // Set loading to false after the request
                 }
-
-
-            },
-            updateAvailableSolutions() {
-                // Clear existing available solutions
-                this.formData.availableSolutions = [];
-
-                // Populate available solutions based on selected items
-                this.checkableItems.forEach(item => {
-                    if (item.checked) {
-
-                        this.formData.availableSolutions.push({
-                            Name: item.label, // Get name from the label
-                            Information: "string", // Replace with the actual information if needed
-                            Value1: item.value1, // Get value1 from the item's value1
-                            Value2: item.value2,
-                            ReplacementStrings: item.replacementLines
-                            //Todo:getlist// Get value2 from the item's value2
-                        });
-                        this.toggleReplacementArea(item)
-                    }
-                });
             },
             getModelByGivenId: function (id) {
                 if (this.selectedMake != null) {
@@ -382,96 +320,6 @@
                         return this.selectedMake.models.find((ele) => ele.id == id);
                     }
                 }
-            },
-            open_Modal_Model() {
-                this.formData.carBrand.id = this.preselectedModelId;
-                this.formData.typeName = this.preselectedtypeName;
-                this.isOpenFromOutsideModel = true; // Open modal
-            },
-            close_Modal_Model() {
-                this.isOpenFromOutsideModel = false; // Close modal
-                this.resetForm();
-            },
-            open_Modal() {
-                this.formData.carBrand.id = this.preselectedModelId;
-                this.formData.typeName = this.preselectedtypeName;
-                this.isOpenFromOutside = true; // Open modal
-            },
-            close_Modal() {
-                this.isOpenFromOutside = false; // Close modal
-                this.resetForm();
-            },
-            resetForm() {
-                // Reset form data to initial state
-                this.formData = {
-                    carBrand: {
-                        "id": this.preselectedModelId
-                    },
-                    yearStart: 2010,
-                    yearEnd: 2020,
-                    engineName: '',
-                    typeName: '',
-                    enginePowerKw: '',
-                    fuelVariant: 'Petrol',
-                    specialInfo: '',
-                    selectedEcu: { id: null },  // Reset selected ECU
-                    availableSolutions: []
-                };
-                this.checkableItems.forEach(item => {
-                    item.checked = false; // Reset checked state to false
-                    item.value1 = 0; // Reset value1 to 0
-                    item.value2 = 0; // Reset value2 to 0
-                    item.replacementLines = [];
-                });
-            },
-            async submitForm() {
-                // Construct the data according to the InputNewVariant model
-                const inputNewVariant = {
-                    CarBrand: {
-                        id: this.preselectedModelId
-                    },
-                    TypeName: this.formData.typeName,
-                    YearStart: this.formData.yearStart,
-                    YearEnd: this.formData.yearEnd,
-                    EngineName: this.formData.engineName,
-                    EnginePowerKw: this.formData.enginePowerKw,
-                    FuelVariant: this.formData.fuelVariant,
-                    SpecialInfo: this.formData.specialInfo,
-                    SelectedEcu: {
-                        // Assuming SelectedEcu should contain id and other properties
-                        id: this.formData.selectedEcu.id,
-                        // Add other properties of input_SelectedEcu as needed
-                    },
-                    AvailableSolutions: this.formData.availableSolutions
-                };
-
-                try {
-                    const apiUrl = import.meta.env.VITE_API_BASE_URL; // Define your API URL here
-                    const response = await fetch(`${apiUrl}/api/Tuning/GenerateTuningVariant`, {
-                        method: 'POST', // Specify the method
-                        headers: {
-                            'Content-Type': 'application/json', // Set the content type to JSON
-                        },
-                        credentials: 'include', // Include credentials such as cookies
-                        body: JSON.stringify(inputNewVariant), // Send the constructed data as JSON
-                    });
-
-                    // Handle response
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    this.close_Modal();
-                    this.close_Modal_Model();
-                    this.fetchTuningData(this.preselectedModelId);
-                    const result = await response.json();
-                    console.log('Success:', result);
-                    // Handle success (e.g., show a success message, close the modal, etc.)
-
-                } catch (error) {
-                    console.error('Error:', error);
-                    // Handle error (e.g., show an error message to the user)
-                }
-
             },
             openModal(state, typename, model) {
                 // Open the modal with the given state
@@ -483,11 +331,6 @@
             closeModal() {
                 // Close the modal
                 this.isModalOpen = false;
-            },
-            handleSubmit(formData) {
-                // Handle form submission from the modal
-                console.log("Form Submitted with Data:", formData);
-                this.closeModal();
             },
             async fetchCarBrands() {
                 this.isLoading = true; // Set loading to true
@@ -648,13 +491,7 @@
             },
         },
         watch: {
-            // Watch for changes in checkableItems to update availableSolutions
-            checkableItems: {
-                deep: true,
-                handler() {
-                    this.updateAvailableSolutions();
-                }
-            }
+          
         }
     };
 </script>
