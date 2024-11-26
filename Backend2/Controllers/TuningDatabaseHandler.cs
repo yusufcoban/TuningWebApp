@@ -1,6 +1,10 @@
 ﻿using System.Data.SqlClient;
+using System.Xml.Linq;
+
 using BaseBackend.Models;
 using Dapper;
+
+using Microsoft.VisualBasic;
 
 using TuningWebApp.Handler;
 
@@ -148,26 +152,28 @@ namespace TuningWebApp.Controllers
 
         public void UpdateTuningVariant(InputNewVariant inputNewVariant)
         {
-            UpdateExistingTuningVariant(inputNewVariant.tuningvariantid, inputNewVariant.TypeName, $"{inputNewVariant.YearStart}-{inputNewVariant.YearEnd}", inputNewVariant.EngineName, inputNewVariant.EnginePowerKw.ToString(), inputNewVariant.FuelVariant);
+            string deleteQuery = "DELETE FROM [ReplacementStrings] WHERE ReplacementId in (SELECT [ReplacementId] FROM [SolutionMappings] WHERE TuningSpecialInfoId = @newTuningVariantId)";
+            string deleteQuery2 = "DELETE FROM [SolutionMappings] WHERE TuningSpecialInfoId = @newTuningVariantId";
+            string deleteQuery3 = "DELETE from [AvailableSolution] where [TuningSpecialInfoId] =@newTuningVariantId";
+            string deleteQuery4 = "DELETE from [TuningSpecialInfo] where [Id] =@newTuningVariantId";
+            string deleteQuery5 = "DELETE from [TuningVariant] where [TuningId] =@newTuningVariantId";
 
-            // Insert a new record into the TuningSpecialInfo table, associating it with the selected ECU info and special details
-            UpdateExistingTuningSpecialInfo(inputNewVariant.tuningvariantid, inputNewVariant.SpecialInfo, inputNewVariant.SelectedEcu.Id);
+            using (var con = new SqlConnection(_configuration.GetConnectionString("dbo")))
+            {
+                // Open the connection
+                con.Open();
+                con.Execute(deleteQuery, new { newTuningVariantId = inputNewVariant.tuningvariantid });
+                con.Execute(deleteQuery2, new { newTuningVariantId = inputNewVariant.tuningvariantid });
+                con.Execute(deleteQuery3, new { newTuningVariantId = inputNewVariant.tuningvariantid });
+                con.Execute(deleteQuery4, new { newTuningVariantId = inputNewVariant.tuningvariantid });
+                con.Execute(deleteQuery5, new { newTuningVariantId = inputNewVariant.tuningvariantid });
+            }
 
-            // Loop through the list of available solutions and insert each into the AvailableSolution table
+            CreateNewTuningVariant(inputNewVariant.tuningvariantid, inputNewVariant.TypeName, $"{inputNewVariant.YearStart}-{inputNewVariant.YearEnd}", inputNewVariant.EngineName, inputNewVariant.EnginePowerKw.ToString(), inputNewVariant.FuelVariant);
+            CreateNewTuningSpecialInfo(inputNewVariant.tuningvariantid, inputNewVariant.SpecialInfo, inputNewVariant.SelectedEcu.Id);
             foreach (var solution in inputNewVariant.AvailableSolutions)
             {
-                UpdateExistingAvailableSolution(inputNewVariant.tuningvariantid, solution.Name, solution.Information, solution.Value1, solution.Value2);
-                string deleteQuery = "DELETE FROM [ReplacementStrings] WHERE ReplacementId in (SELECT [ReplacementId] FROM [SolutionMappings] WHERE TuningSpecialInfoId = @newTuningVariantId)";
-                string deleteQuery2 = "DELETE FROM [SolutionMappings] WHERE TuningSpecialInfoId = @newTuningVariantId";
-
-                using (var con = new SqlConnection(_configuration.GetConnectionString("dbo")))
-                {
-                    // Open the connection
-                    con.Open();
-                    con.Execute(deleteQuery, new { inputNewVariant.tuningvariantid });
-                    con.Execute(deleteQuery2, new { inputNewVariant.tuningvariantid });
-                }
-
+                CreateNewAvailableSolution(inputNewVariant.tuningvariantid, solution.Name, solution.Information, solution.Value1, solution.Value2);
                 foreach (input_ReplacementStrings item in solution.replacementStrings)
                 {
                     _stringReplacementHandler.InsertReplacementStringAsync(inputNewVariant.tuningvariantid, solution.Name, item.searchString, item.replacementString, item.number);
@@ -175,43 +181,6 @@ namespace TuningWebApp.Controllers
             }
         }
 
-        private void UpdateExistingAvailableSolution(string newTuningVariantId, string name, string information, int value1, int value2)
-        {
-            string deleteQuery = "DELETE from [AvailableSolution] where [TuningSpecialInfoId] =@newTuningVariantId";
-
-            using (var con = new SqlConnection(_configuration.GetConnectionString("dbo")))
-            {
-                // Open the connection
-                con.Open();
-                con.Execute(deleteQuery, new { newTuningVariantId });
-            }
-
-            CreateNewAvailableSolution(newTuningVariantId, name, information, value1, value2);
-        }
-
-        private void UpdateExistingTuningSpecialInfo(string newTuningVariantId, string specialInfo, int id)
-        {
-            string deleteQuery = "DELETE from [TuningSpecialInfo] where [Id] =@newTuningVariantId";
-            using (var con = new SqlConnection(_configuration.GetConnectionString("dbo")))
-            {
-                // Open the connection
-                con.Open();
-                con.Execute(deleteQuery, new { newTuningVariantId });
-            }
-            CreateNewTuningSpecialInfo(newTuningVariantId, specialInfo, id);
-        }
-
-        private void UpdateExistingTuningVariant(string newTuningVariantId, string typeName, string v1, string engineName, string v2, string fuelVariant)
-        {
-            string deleteQuery = "DELETE from [TuningVariant] where [TuningId] =@newTuningVariantId";
-            using (var con = new SqlConnection(_configuration.GetConnectionString("dbo")))
-            {
-                // Open the connection
-                con.Open();
-                con.Execute(deleteQuery, new { newTuningVariantId });
-            }
-            CreateNewTuningVariant(newTuningVariantId,  typeName,  v1,  engineName,  v2,  fuelVariant);
-        }
 
         public string GenerateTuningVariant(InputNewVariant inputNewVariant)
         {
@@ -335,7 +304,7 @@ namespace TuningWebApp.Controllers
             // Define the SQL query for inserting a new record
             string query = @"
                              INSERT INTO [dbo].[TuningSpecialInfo] (Id, AdditionalInformation, EcuInfoId, isDeleted)
-                                VALUES (@Id, @AdditionalInformation, @EcuInfoId , false)";
+                                VALUES (@Id, @AdditionalInformation, @EcuInfoId , 0)";
 
             // Use the using statement to ensure proper disposal of the connection
             using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("dbo")))
@@ -358,7 +327,7 @@ namespace TuningWebApp.Controllers
             // Step 1: Define the SQL query for inserting a new record into the TuningVariant table
             string query = @"
                               INSERT INTO [dbo].[TuningVariant] (TuningId, TypeName, Year, Engine, Horsepower, Variant, isDeleted)
-                              VALUES (@TuningId, @TypeName, @Year, @Engine, @Horsepower, @Variant, false)";
+                              VALUES (@TuningId, @TypeName, @Year, @Engine, @Horsepower, @Variant, 0)";
 
             // Step 2: Use the 'using' statement to ensure proper disposal of the connection
             using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("dbo")))
@@ -384,7 +353,7 @@ namespace TuningWebApp.Controllers
             // Define the SQL query for inserting a new record into the AvailableSolution table
             string query = @"
                              INSERT INTO [dbo].[AvailableSolution] (TuningSpecialInfoId, Name, Information, Value1, Value2, Checked, isDeleted)
-                             VALUES (@TuningSpecialInfoId, @Name, @Information, @Value1, @Value2, @Checked, false)";
+                             VALUES (@TuningSpecialInfoId, @Name, @Information, @Value1, @Value2, @Checked, 0)";
 
             // Use the 'using' statement to ensure proper disposal of the connection
             using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("dbo")))

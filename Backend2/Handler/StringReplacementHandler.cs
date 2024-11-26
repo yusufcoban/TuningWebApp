@@ -232,8 +232,8 @@ namespace TuningWebApp.Handler
             using (var connection = new SqlConnection(_configuration.GetConnectionString("dbo")))
             {
                 string query = @"
-                INSERT INTO ReplacementStrings (SearchString, ReplaceString, Threshold, Action, Description)
-                VALUES (@SearchString, @ReplaceString, @Threshold, @Action, @Description);
+                INSERT INTO ReplacementStrings (SearchString, ReplaceString, Threshold, Action, Description, isDeleted)
+                VALUES (@SearchString, @ReplaceString, @Threshold, @Action, @Description, 0);
                 SELECT CAST(SCOPE_IDENTITY() AS int);";
 
                 int newId = connection.ExecuteScalar<int>(query, new

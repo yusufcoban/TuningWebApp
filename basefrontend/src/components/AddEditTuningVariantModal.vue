@@ -192,7 +192,7 @@ state3 => edit on existing one
                     : String(this.formData.specialInfo || ''); // Otherwise, ensure it's a string
 
                 const inputNewVariant = {
-                    tuningvariantid: this.state === 3 ? this.model.tuningId : undefined, // Add only if state is 3
+                    tuningvariantid: this.state === 3 ? this.model.tuningId : '' , // Add only if state is 3
                     carBrand: {
                         id: this.formData.carBrand || '', // Ensure 'id' is passed, fallback to empty string if missing
                     },
@@ -206,14 +206,14 @@ state3 => edit on existing one
                     selectedEcu: {
                         id: this.formData.selectedEcu?.id || 0, // Ensure id is passed, fallback to 0 if missing
                     },
-                    availableSolutions: this.formData.availableSolutions
+                    availableSolutions: this.formData.checkableItems
                         .filter(solution => solution.checked)
                         .map(solution => ({
-                            name: solution.name || '', // Ensure name is passed, fallback to empty string
+                            name: solution.id || '', // Ensure name is passed, fallback to empty string
                             information: solution.information || '', // Ensure information is passed, fallback to empty string
                             value1: solution.value1 || 0, // Default to 0 if missing
                             value2: solution.value2 || 0, // Default to 0 if missing
-                            replacementStrings: solution.replacementsCommands?.map(command => ({
+                            replacementStrings: solution.replacementLines?.map(command => ({
                                 searchString: command.searchString || '', // Ensure searchString is passed
                                 replacementString: command.replaceString || '', // Ensure replaceString is passed
                                 number: command.threshold || 0, // Default to 0 if missing
