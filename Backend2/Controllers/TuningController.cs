@@ -62,6 +62,13 @@ namespace TuningWebApp.Controllers
             return Ok(_tuningDatabaseHandler.GenerateTuningVariant(inputNewVariant));
         }
 
+        [HttpPost("UpdateTuningVariant")]
+        public ActionResult<TuningSpecialInfo> UpdateTuningVariant(InputNewVariant inputNewVariant)
+        {
+            _tuningDatabaseHandler.UpdateTuningVariant(inputNewVariant);
+            return Ok();
+        }
+
         //Todo check for admin
         [HttpPost("DeleteTuningVariant")]
         public ActionResult<TuningSpecialInfo> DeleteTuningVariant(StringInput stringInput)

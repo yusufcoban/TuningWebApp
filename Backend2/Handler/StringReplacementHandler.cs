@@ -1,5 +1,7 @@
 ﻿using Dapper;
 
+using Microsoft.AspNetCore.Identity.UI.Services;
+
 using System.Data.SqlClient;
 
 namespace TuningWebApp.Handler
@@ -17,7 +19,7 @@ namespace TuningWebApp.Handler
         {
             _configuration = configuration;
             _myUploadedFileHandler = myUploadedFile;
-            _logger = ilogger;  
+            _logger = ilogger;
         }
 
         public bool checkIfAllSolutionsAvailable(List<SolutionMapping> solutions, List<string> selectedTunings)
@@ -32,7 +34,7 @@ namespace TuningWebApp.Handler
         // Main function to replace strings in the file based on mappings and thresholds
         public async Task<bool> ReplaceStringsInFile(MyUploadedFile MyUploadedFile, string filePath, List<string> names, string tuningId)
         {
-             _logger.LogError(MyUploadedFile.FileName + " replacement strings will be checked...");
+            _logger.LogError(MyUploadedFile.FileName + " replacement strings will be checked...");
 
             // Step 1: Read the content of the file as binary.
             byte[] fileContentBytes = File.ReadAllBytes(filePath); // Use binary file content
@@ -40,15 +42,15 @@ namespace TuningWebApp.Handler
 
             // Step 2: Get mappings from SolutionMappings based on tuningId.
             var solutionMappings = GetSolutionMappings(tuningId, names);
-             _logger.LogError(solutionMappings.Count() + " automations were found for this solution...");
+            _logger.LogError(solutionMappings.Count() + " automations were found for this solution...");
 
             if (checkIfAllSolutionsAvailable(solutionMappings, names))
             { // Step 3: Loop through the solution mappings.
-                 _logger.LogError("All selected solutions are available for this file request");
+                _logger.LogError("All selected solutions are available for this file request");
 
                 foreach (var mapping in solutionMappings)
                 {
-                     _logger.LogError("Solution " + mapping.Name + " will be procedured...");
+                    _logger.LogError("Solution " + mapping.Name + " will be procedured...");
 
                     // Step 4: Get ReplacementStrings based on the mapping's ReplacementId.
                     var replacementCommands = GetReplacementCommands(mapping.ReplacementId);
@@ -61,7 +63,7 @@ namespace TuningWebApp.Handler
 
                         // Find the search string in the file with threshold similarity.
                         var matchingPositions = GetMatchingPositions(fileContentBytes, searchBytes, command.Threshold);
-                         _logger.LogError("Solution " + mapping.Name + " could be found on the target file...");
+                        _logger.LogError("Solution " + mapping.Name + " could be found on the target file...");
 
                         // Step 6: Replace the matches found
                         foreach (var position in matchingPositions)
@@ -69,7 +71,7 @@ namespace TuningWebApp.Handler
 
                             // Replace the matched binary sequence with ReplaceString at the identified positions
                             fileContentBytes = ReplaceAtPosition(fileContentBytes, position, command.ReplaceString);
-                             _logger.LogError("Solution " + mapping.Name + " step algorithm is effected...");
+                            _logger.LogError("Solution " + mapping.Name + " step algorithm is effected...");
                         }
                     }
                     await _myUploadedFileHandler.UpdateUploadedFileStateAsync(MyUploadedFile.Id, 5, "Automation did this file..."); // set to finished
@@ -289,6 +291,7 @@ namespace TuningWebApp.Handler
 
             return commands;
         }
+
     }
 
     // Models to represent the database entities

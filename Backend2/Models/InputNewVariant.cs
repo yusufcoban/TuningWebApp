@@ -1,5 +1,7 @@
 public class InputNewVariant
 {
+    public string tuningvariantid { get; set; }
+
     public input_CarBrandInfo CarBrand { get; set; }
     public string TypeName { get; set; }
     public int YearStart { get; set; }

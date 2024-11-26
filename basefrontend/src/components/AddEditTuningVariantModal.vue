@@ -139,7 +139,6 @@ state3 => edit on existing one
         data() {
             return {
                 triggerModal: false,
-
                 formData: {
                     "carBrand": {
                         "id": 0
@@ -184,8 +183,64 @@ state3 => edit on existing one
             closeModal() {
                 this.$emit("closemodal", false);
             },
-            submitForm() {
-                this.$emit("submit", this.formData);
+            async submitForm() {
+                const apiUrl = import.meta.env.VITE_API_BASE_URL;
+                const inputNewVariant = {
+
+                    CarBrand: {
+                        id: this.formData.carBrand
+                    },
+                    TypeName: this.formData.typeName,
+                    YearStart: this.formData.yearStart,
+                    YearEnd: this.formData.yearEnd,
+                    EngineName: this.formData.engineName,
+                    EnginePowerKw: this.formData.enginePowerKw,
+                    FuelVariant: this.formData.fuelVariant,
+                    SpecialInfo: this.formData.specialInfo,
+                    SelectedEcu: {
+                        // Assuming SelectedEcu should contain id and other properties
+                        id: this.formData.selectedEcu.id,
+                        // Add other properties of input_SelectedEcu as needed
+                    },
+                    AvailableSolutions: this.formData.availableSolutions.filter(solution => solution.checked === true)
+                };
+
+                const apiEndpoint =
+                    this.state === 1 || this.state === 2
+                        ? `${apiUrl}/api/Tuning/GenerateTuningVariant`
+                        : this.state === 3
+                            ? `${apiUrl}/api/Tuning/UpdateTuningVariant`
+                            : null;
+
+                // If state is invalid, exit the function
+                if (!apiEndpoint) {
+                    console.error('Invalid state:', this.state);
+                    return;
+                }
+
+                if (this.state === 3) {
+                    inputNewVariant.tuningvariantid = this.model.tuningId;
+                }
+                try {
+                    // Make the API request
+                    const response = await fetch(apiEndpoint, {
+                        method: 'POST', // HTTP method
+                        headers: { 'Content-Type': 'application/json' }, // JSON headers
+                        credentials: 'include', // Include credentials
+                        body: JSON.stringify(inputNewVariant), // Request body
+                    });
+
+                    // Handle response errors
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+
+                    // Emit the close modal event
+                    this.$emit('closemodal', false);
+                } catch (error) {
+                    console.error('Error:', error);
+                    // Handle errors (e.g., show an error message)
+                }
             },
             updateAvailableSolutions() {
                 // Logic for updating solutions based on checkable items
