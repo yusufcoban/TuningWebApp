@@ -2,6 +2,8 @@
 using BaseBackend.Models;
 using Dapper;
 
+using TuningWebApp.Handler;
+
 namespace TuningWebApp.Controllers
 {
     public class TuningDatabaseHandler
@@ -346,7 +348,7 @@ namespace TuningWebApp.Controllers
                 {
                     Id = newTuningVariantIdSpecial,
                     AdditionalInformation = string.IsNullOrEmpty(specialInfo) ? null : specialInfo,
-                    EcuInfoId = ecuId > 0 ? ecuId : (int?)nul
+                    EcuInfoId = ecuId > 0 ? ecuId : (int?)null
                 });
             }
         }

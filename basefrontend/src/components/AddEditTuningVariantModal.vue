@@ -202,7 +202,7 @@ state3 => edit on existing one
                     engineName: this.formData.engineName || '', // Ensure a string value
                     enginePowerKw: this.formData.enginePowerKw || 0, // Default to 0 if missing
                     fuelVariant: this.formData.fuelVariant || '', // Ensure a string value
-                    specialInfo: specialInfoValue, // Ensure specialInfo is now a string
+                    specialInfo: '', // Ensure specialInfo is now a string
                     selectedEcu: {
                         id: this.formData.selectedEcu?.id || 0, // Ensure id is passed, fallback to 0 if missing
                     },
