@@ -10,6 +10,7 @@
                     <th>Last Modified Date</th>
                     <th>State</th>
                     <th>Title</th>
+                    <th>Infos</th>
                 </tr>
             </thead>
             <tbody>
@@ -19,9 +20,8 @@
                     <td>{{ formatDate(file.uploadDate) }}</td>
                     <td>{{ formatDate(file.modifyDate) }}</td>
                     <td>{{ file.state }}</td>
-                    <td>{{ file.fileName }}
-              </td>
-
+                    <td>{{ file.fileName }} </td>
+                    <td>{{ file.additionalInfo }}</td>
                 </tr>
             </tbody>
         </table>
@@ -81,7 +81,7 @@
                     const response = await fetch(`${apiUrl}/api/MyFiles`, {
                         method: 'GET',
                         credentials: 'include', // This ensures cookies are sent with the request
-                      
+
                     });
 
                     if (!response.ok) {
@@ -105,41 +105,35 @@
 </script>
 
 <style scoped>
-    .uploaded-files
-    {
+    .uploaded-files {
         padding: 20px;
         max-width: 800px;
         margin: auto;
         font-family: Arial, sans-serif;
     }
 
-    h1
-    {
+    h1 {
         color: #2c3e50;
         text-align: center;
     }
 
-    table
-    {
+    table {
         width: 100%;
         border-collapse: collapse;
         margin-top: 20px;
     }
 
-    th, td
-    {
+    th, td {
         border: 1px solid #ddd;
         padding: 8px;
         text-align: left;
     }
 
-    th
-    {
+    th {
         background-color: #f2f2f2;
     }
 
-    p
-    {
+    p {
         text-align: center;
         color: #999;
     }

@@ -1,8 +1,8 @@
 ﻿using Dapper;
-using System.Data.SqlClient;
-using System.Collections.Generic;
 
-namespace YourNamespace.Controllers
+using System.Data.SqlClient;
+
+namespace TuningWebApp.Controllers
 {
     public class UserHandler
     {

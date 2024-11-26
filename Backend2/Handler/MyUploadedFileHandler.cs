@@ -73,12 +73,14 @@ public class MyUploadedFileHandler
     }
 
     // UPDATE: Update state of uploaded file
-    public async Task<bool> UpdateUploadedFileStateAsync(int id, int newState)
+
+    public async Task<bool> UpdateUploadedFileStateAsync(int id, int newState, string comment)
     {
         const string query = @"
             UPDATE MyUploadedFiles
             SET 
                 State = @State,
+                additionalInfo=ISNULL(additionalInfo, '') + @Comment,
                 ModifyDate=GetDate()
             WHERE Id = @Id";
 
@@ -88,13 +90,14 @@ public class MyUploadedFileHandler
             var rowsAffected = await connection.ExecuteAsync(query, new
             {
                 Id = id,
-                State = newState
+                State = newState,
+                comment
+
             });
 
             return rowsAffected > 0; // Return true if the update was successful
         }
     }
-   
     public async Task<bool> UpdateUploadedFileAsync(MyUploadedFile uploadedFile)
     {
         const string query = @"

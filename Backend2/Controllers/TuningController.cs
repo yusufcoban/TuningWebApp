@@ -3,7 +3,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace YourNamespace.Controllers
+namespace TuningWebApp.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -44,8 +44,14 @@ namespace YourNamespace.Controllers
             return Ok(_tuningDatabaseHandler.getTuningSpecialInfoByTuningId(id));
         }
 
+        [HttpGet("tuningspecialfull/{id}")]
+        public ActionResult<TuningSpecialInfo> GetTuningSpecialInfoFull(string id)
+        {
+            return Ok(_tuningDatabaseHandler.getTuningSpecialInfoByTuningIdfull(id));
+        }
+
         [HttpGet("tuningecuListFull")]
-        public ActionResult<TuningSpecialInfo> GetEcuList()
+        public ActionResult<EcuInfo> GetEcuList()
         {
             return Ok(_tuningDatabaseHandler.GetEcuList());
         }
@@ -54,6 +60,21 @@ namespace YourNamespace.Controllers
         public ActionResult<TuningSpecialInfo> GenerateTuningVariant(InputNewVariant inputNewVariant)
         {
             return Ok(_tuningDatabaseHandler.GenerateTuningVariant(inputNewVariant));
+        }
+
+        [HttpPost("UpdateTuningVariant")]
+        public ActionResult<TuningSpecialInfo> UpdateTuningVariant(InputNewVariant inputNewVariant)
+        {
+            _tuningDatabaseHandler.UpdateTuningVariant(inputNewVariant);
+            return Ok();
+        }
+
+        //Todo check for admin
+        [HttpPost("DeleteTuningVariant")]
+        public ActionResult<TuningSpecialInfo> DeleteTuningVariant(StringInput stringInput)
+        {
+            _tuningDatabaseHandler.DeleteTuningVariant(stringInput.Input);
+            return Ok();
         }
     }
 }

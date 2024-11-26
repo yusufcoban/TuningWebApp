@@ -6,10 +6,8 @@ import { useStore } from 'vuex'; // Vuex store
 import App from '@/App.vue'; // Main layout
 import MyFiles from '@/components/MyFiles.vue'; // Main layout
 import OpenTasks from '@/components/OpenTasks.vue'; // Admin task overview
-
 import MyFilesViewer from '@/components/MyFilesViewer.vue';
 import AutoDatabase from '@/components/AutoDatabase.vue'; // Dashboard component
-
 // Define your routes
 const routes = [
     {
@@ -59,9 +57,7 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
     const store = useStore();
     const isAuthenticated = store.state.user !== null; // Check if user is authenticated
-
-    console.log(`Navigating to: ${to.path}, Authenticated: ${isAuthenticated}`);
-    
+        
     if (to.meta.requiresAuth && !isAuthenticated) {
         next({ path: '/login' }); // Redirect to login if not authenticated
     } else {

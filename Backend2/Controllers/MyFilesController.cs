@@ -1,6 +1,4 @@
-﻿using BaseBackend.Models; // Import your model namespace
-
-using Microsoft.AspNetCore.Authorization; // Add this namespace
+﻿using Microsoft.AspNetCore.Authorization; // Add this namespace
 using Microsoft.AspNetCore.Mvc;
 
 namespace BaseBackend.Controllers
@@ -57,8 +55,10 @@ namespace BaseBackend.Controllers
         private readonly string _targetFilePath;
 
         private readonly MyUploadedFileHandler _fileHandler;
+        private readonly TaskHandler _taskHandler;
 
-        public MyFilesController(MyUploadedFileHandler fileHandler)
+
+        public MyFilesController(MyUploadedFileHandler fileHandler, TaskHandler taskHandler)
         {
             _fileHandler = fileHandler;
             // Set the path where you want to save uploaded files
@@ -69,6 +69,8 @@ namespace BaseBackend.Controllers
             {
                 Directory.CreateDirectory(_targetFilePath);
             }
+
+            _taskHandler = taskHandler; 
         }
 
 
@@ -168,6 +170,16 @@ namespace BaseBackend.Controllers
             {
                 Console.WriteLine($"Solution: {solution}");
             }
+
+            //firing up automation
+            System.Threading.Tasks.Task.Run(async () =>
+            {
+                // Wait for 15 seconds
+                await System.Threading.Tasks.Task.Delay(TimeSpan.FromSeconds(15));
+
+                // Start the task after the delay
+                _taskHandler.CheckForOpenTasksAndHandle();
+            });
 
             return Ok(new { Message = "File and solutions uploaded successfully." });
         }

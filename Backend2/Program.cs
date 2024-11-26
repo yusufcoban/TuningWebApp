@@ -1,9 +1,15 @@
 using BaseBackend.Controllers;
+
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.OpenApi.Models;
-using YourNamespace.Controllers;
+
+using TuningWebApp.Controllers;
+using TuningWebApp.Handler;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Logging.AddConsole();               // Adds console logging, outputs to stdout
+builder.Logging.AddDebug();
+builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging")); // Optional: Loads logging settings from configuration
 
 // Add services to the container.
 builder.Services.AddControllersWithViews(); // For MVC support
