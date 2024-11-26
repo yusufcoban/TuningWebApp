@@ -1,13 +1,6 @@
-﻿using BaseBackend.Models;
-
+﻿using System.Data.SqlClient;
+using BaseBackend.Models;
 using Dapper;
-
-using Microsoft.VisualBasic;
-
-using System.Data.SqlClient;
-using System.Xml.Linq;
-
-using TuningWebApp.Handler;
 
 namespace TuningWebApp.Controllers
 {
@@ -339,8 +332,8 @@ namespace TuningWebApp.Controllers
         {
             // Define the SQL query for inserting a new record
             string query = @"
-                             INSERT INTO [dbo].[TuningSpecialInfo] (Id, AdditionalInformation, EcuInfoId)
-                                VALUES (@Id, @AdditionalInformation, @EcuInfoId)";
+                             INSERT INTO [dbo].[TuningSpecialInfo] (Id, AdditionalInformation, EcuInfoId, isDeleted)
+                                VALUES (@Id, @AdditionalInformation, @EcuInfoId , false)";
 
             // Use the using statement to ensure proper disposal of the connection
             using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("dbo")))
@@ -353,7 +346,7 @@ namespace TuningWebApp.Controllers
                 {
                     Id = newTuningVariantIdSpecial,
                     AdditionalInformation = string.IsNullOrEmpty(specialInfo) ? null : specialInfo,
-                    EcuInfoId = ecuId > 0 ? ecuId : (int?)null
+                    EcuInfoId = ecuId > 0 ? ecuId : (int?)nul
                 });
             }
         }
@@ -362,8 +355,8 @@ namespace TuningWebApp.Controllers
         {
             // Step 1: Define the SQL query for inserting a new record into the TuningVariant table
             string query = @"
-                              INSERT INTO [dbo].[TuningVariant] (TuningId, TypeName, Year, Engine, Horsepower, Variant)
-                              VALUES (@TuningId, @TypeName, @Year, @Engine, @Horsepower, @Variant)";
+                              INSERT INTO [dbo].[TuningVariant] (TuningId, TypeName, Year, Engine, Horsepower, Variant, isDeleted)
+                              VALUES (@TuningId, @TypeName, @Year, @Engine, @Horsepower, @Variant, false)";
 
             // Step 2: Use the 'using' statement to ensure proper disposal of the connection
             using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("dbo")))
@@ -388,8 +381,8 @@ namespace TuningWebApp.Controllers
         {
             // Define the SQL query for inserting a new record into the AvailableSolution table
             string query = @"
-                             INSERT INTO [dbo].[AvailableSolution] (TuningSpecialInfoId, Name, Information, Value1, Value2, Checked)
-                             VALUES (@TuningSpecialInfoId, @Name, @Information, @Value1, @Value2, @Checked)";
+                             INSERT INTO [dbo].[AvailableSolution] (TuningSpecialInfoId, Name, Information, Value1, Value2, Checked, isDeleted)
+                             VALUES (@TuningSpecialInfoId, @Name, @Information, @Value1, @Value2, @Checked, false)";
 
             // Use the 'using' statement to ensure proper disposal of the connection
             using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("dbo")))

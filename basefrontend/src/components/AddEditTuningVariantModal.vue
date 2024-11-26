@@ -185,26 +185,46 @@ state3 => edit on existing one
             },
             async submitForm() {
                 const apiUrl = import.meta.env.VITE_API_BASE_URL;
-                const inputNewVariant = {
 
-                    CarBrand: {
-                        id: this.formData.carBrand
+                // Ensure specialInfo is converted to string (or extract necessary property)
+                const specialInfoValue = typeof this.formData.specialInfo === 'object'
+                    ? JSON.stringify(this.formData.specialInfo) // Convert object to JSON string if needed
+                    : String(this.formData.specialInfo || ''); // Otherwise, ensure it's a string
+
+                const inputNewVariant = {
+                    tuningvariantid: this.state === 3 ? this.model.tuningId : undefined, // Add only if state is 3
+                    carBrand: {
+                        id: this.formData.carBrand || '', // Ensure 'id' is passed, fallback to empty string if missing
                     },
-                    TypeName: this.formData.typeName,
-                    YearStart: this.formData.yearStart,
-                    YearEnd: this.formData.yearEnd,
-                    EngineName: this.formData.engineName,
-                    EnginePowerKw: this.formData.enginePowerKw,
-                    FuelVariant: this.formData.fuelVariant,
-                    SpecialInfo: this.formData.specialInfo,
-                    SelectedEcu: {
-                        // Assuming SelectedEcu should contain id and other properties
-                        id: this.formData.selectedEcu.id,
-                        // Add other properties of input_SelectedEcu as needed
+                    typeName: this.formData.typeName || '', // Ensure a string value
+                    yearStart: this.formData.yearStart || 0, // Default to 0 if missing
+                    yearEnd: this.formData.yearEnd || 0, // Default to 0 if missing
+                    engineName: this.formData.engineName || '', // Ensure a string value
+                    enginePowerKw: this.formData.enginePowerKw || 0, // Default to 0 if missing
+                    fuelVariant: this.formData.fuelVariant || '', // Ensure a string value
+                    specialInfo: specialInfoValue, // Ensure specialInfo is now a string
+                    selectedEcu: {
+                        id: this.formData.selectedEcu?.id || 0, // Ensure id is passed, fallback to 0 if missing
                     },
-                    AvailableSolutions: this.formData.availableSolutions.filter(solution => solution.checked === true)
+                    availableSolutions: this.formData.availableSolutions
+                        .filter(solution => solution.checked)
+                        .map(solution => ({
+                            name: solution.name || '', // Ensure name is passed, fallback to empty string
+                            information: solution.information || '', // Ensure information is passed, fallback to empty string
+                            value1: solution.value1 || 0, // Default to 0 if missing
+                            value2: solution.value2 || 0, // Default to 0 if missing
+                            replacementStrings: solution.replacementsCommands?.map(command => ({
+                                searchString: command.searchString || '', // Ensure searchString is passed
+                                replacementString: command.replaceString || '', // Ensure replaceString is passed
+                                number: command.threshold || 0, // Default to 0 if missing
+                            })) || [],
+                        })),
                 };
 
+                // Debugging: Print the final inputNewVariant to inspect the payload
+                console.log('Input New Variant:', inputNewVariant);
+
+                // Determine the correct API endpoint based on the state
                 const apiEndpoint =
                     this.state === 1 || this.state === 2
                         ? `${apiUrl}/api/Tuning/GenerateTuningVariant`
@@ -212,35 +232,30 @@ state3 => edit on existing one
                             ? `${apiUrl}/api/Tuning/UpdateTuningVariant`
                             : null;
 
-                // If state is invalid, exit the function
                 if (!apiEndpoint) {
                     console.error('Invalid state:', this.state);
                     return;
                 }
 
-                if (this.state === 3) {
-                    inputNewVariant.tuningvariantid = this.model.tuningId;
-                }
                 try {
                     // Make the API request
                     const response = await fetch(apiEndpoint, {
-                        method: 'POST', // HTTP method
-                        headers: { 'Content-Type': 'application/json' }, // JSON headers
-                        credentials: 'include', // Include credentials
-                        body: JSON.stringify(inputNewVariant), // Request body
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include',
+                        body: JSON.stringify(inputNewVariant), // Wrap the payload with inputNewVariant
                     });
 
-                    // Handle response errors
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
                     }
 
-                    // Emit the close modal event
+                    // Emit close modal event
                     this.$emit('closemodal', false);
                 } catch (error) {
                     console.error('Error:', error);
-                    // Handle errors (e.g., show an error message)
                 }
+
             },
             updateAvailableSolutions() {
                 // Logic for updating solutions based on checkable items
@@ -438,14 +453,12 @@ state3 => edit on existing one
     };
 </script>
 <style scoped>
-    .modal-body
-    {
+    .modal-body {
         overflow-y: scroll;
         height: 1050px
     }
 
-    .modal-dialog
-    {
+    .modal-dialog {
         max-width: 100%;
         position: relative;
         width: auto;
@@ -453,16 +466,13 @@ state3 => edit on existing one
         pointer-events: none;
     }
 
-    @media (min-width: 576px)
-    {
-        .modal-dialog
-        {
+    @media (min-width: 576px) {
+        .modal-dialog {
             margin: 1.75rem auto;
         }
     }
 
-    .modal
-    {
+    .modal {
         position: fixed;
         top: 0;
         left: 0;
@@ -474,91 +484,75 @@ state3 => edit on existing one
         outline: 0;
     }
 
-    .auto-data
-    {
+    .auto-data {
         text-align: center;
         width: 100%;
     }
 
-    .tuning-info
-    {
+    .tuning-info {
         margin-top: 20px; /* Optional margin for overall tuning info */
     }
 
-    .tuning-row
-    {
+    .tuning-row {
         display: flex;
         flex-wrap: wrap; /* Allow cards to wrap into the next line */
         justify-content: space-between; /* Space out the cards evenly */
     }
 
-    .tuning-card
-    {
+    .tuning-card {
         flex: 0 1 calc(50% - 20px); /* Two cards per row with space between */
         margin-bottom: 20px; /* Space between rows */
     }
 
-    .card
-    {
+    .card {
         /* Add any additional styles for the card here */
     }
 
-    .underline-header
-    {
+    .underline-header {
         text-decoration: underline; /* Underline the typeName */
     }
 
-    .card
-    {
+    .card {
         margin: 20px auto;
         max-width: 100em;
     }
 
-    .items-grid
-    {
+    .items-grid {
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
     }
 
-    .item
-    {
+    .item {
         transition: transform 0.3s;
     }
 
-        .item:hover
-        {
+        .item:hover {
             transform: scale(1.05);
         }
 
-    .brand-icon, .model-icon
-    {
+    .brand-icon, .model-icon {
         width: 120px; /* Adjust size as needed */
         height: auto;
     }
 
-    .tuning-section
-    {
+    .tuning-section {
         margin-top: 20px;
     }
 
-        .tuning-section h6
-        {
+        .tuning-section h6 {
             margin-bottom: 10px;
         }
 
-    .petrol-diesel
-    {
+    .petrol-diesel {
         margin-top: 10px;
     }
 
-        .petrol-diesel h7
-        {
+        .petrol-diesel h7 {
             font-weight: bold;
         }
 
-    .upload-area
-    {
+    .upload-area {
         margin-top: 20px;
         text-align: center;
     }
