@@ -194,7 +194,7 @@ namespace TuningWebApp.Handler
         }
 
         // Helper function to retrieve solution mappings from the database
-        private List<SolutionMapping> GetSolutionMappings(string tuningId, List<string> names)
+        public List<SolutionMapping> GetSolutionMappings(string tuningId, List<string> names)
         {
             var mappings = new List<SolutionMapping>();
 
@@ -257,7 +257,7 @@ namespace TuningWebApp.Handler
         }
 
         // Helper function to retrieve replacement commands from the database
-        private List<ReplacementCommand> GetReplacementCommands(int replacementId)
+        public List<ReplacementCommand> GetReplacementCommands(int replacementId)
         {
             var commands = new List<ReplacementCommand>();
 

@@ -44,6 +44,12 @@ namespace TuningWebApp.Controllers
             return Ok(_tuningDatabaseHandler.getTuningSpecialInfoByTuningId(id));
         }
 
+        [HttpGet("tuningspecialfull/{id}")]
+        public ActionResult<TuningSpecialInfo> GetTuningSpecialInfoFull(string id)
+        {
+            return Ok(_tuningDatabaseHandler.getTuningSpecialInfoByTuningIdfull(id));
+        }
+
         [HttpGet("tuningecuListFull")]
         public ActionResult<EcuInfo> GetEcuList()
         {

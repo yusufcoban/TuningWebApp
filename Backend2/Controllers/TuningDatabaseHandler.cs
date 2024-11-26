@@ -98,6 +98,24 @@ namespace TuningWebApp.Controllers
             }
         }
 
+        public List<TuningSpecialInfo> getTuningSpecialInfoByTuningIdfull(string id)
+        {
+            List<TuningSpecialInfo> miniList = getTuningSpecialInfoByTuningId(id);
+            foreach (var item in miniList)
+            {
+                foreach (var itemSolution in item.AvailableSolutions)
+                {
+                    itemSolution.ReplacementsCommands = new List<ReplacementCommand>();
+                    List<SolutionMapping> replacementIds = _stringReplacementHandler.GetSolutionMappings(id, new List<string>() { itemSolution.Name });
+                    foreach (var replacementId in replacementIds)
+                    {
+                        itemSolution.ReplacementsCommands.AddRange(_stringReplacementHandler.GetReplacementCommands(replacementId.ReplacementId));
+                    }
+                }
+            }
+            return miniList;
+        }
+
         public void DeleteTuningVariant(string tuningVariantId)
         {
             using (var con = new SqlConnection(_configuration.GetConnectionString("dbo")))

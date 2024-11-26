@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 
 using TuningWebApp.Controllers;
+using TuningWebApp.Handler;
 
 namespace BaseBackend.Models
 {
@@ -46,6 +47,7 @@ namespace BaseBackend.Models
         public int Value1 { get; set; }
         public int Value2 { get; set; }
         public bool Checked { get; set; }
+        public List<ReplacementCommand> ReplacementsCommands { get; set; }
     }
 
     public class EcuConnection

@@ -49,6 +49,66 @@
                                         <input type="number" id="enginePowerKw" v-model="formData.enginePowerKw" class="form-control" required />
                                     </div>
                                 </div>
+                                <!--Available solutions-->
+
+                                <div v-for="(item, index) in formData.checkableItems" :key="index" class="form-check mb-4">
+                                    <!-- Checkbox -->
+                                    <input type="checkbox"
+                                           :id="item.id"
+                                           class="form-check-input"
+                                           v-model="item.checked"
+                                           @change="updateAvailableSolutions()">
+                                    <label :for="item.id" class="form-check-label">{{ item.label }}</label>
+
+                                    <!-- Show additional inputs if showValues is true and checked -->
+                                    <div v-if="item.showValues && item.checked" class="mt-2">
+                                        <label>{{ item.textValue1 }}</label>
+                                        <input type="number"
+                                               v-model="item.value1"
+                                               class="form-control"
+                                               placeholder="Value 1" />
+                                        <label class="mt-2">{{ item.textValue2 }}</label>
+                                        <input type="number"
+                                               v-model="item.value2"
+                                               class="form-control"
+                                               placeholder="Value 2" />
+                                    </div>
+
+                                    <!-- Replacement lines -->
+                                    <div v-if="item.checked" class="mt-3">
+                                        <label>Replacement Lines</label>
+                                        <div v-for="(line, lineIndex) in item.replacementLines" :key="lineIndex" class="d-flex align-items-center mt-1">
+                                            <input type="text"
+                                                   v-model="item.replacementLines[lineIndex].searchString"
+                                                   class="form-control"
+                                                   placeholder="Enter searchString" />
+
+                                            <input type="text"
+                                                   v-model="item.replacementLines[lineIndex].replaceString"
+                                                   class="form-control"
+                                                   placeholder="Enter replaceString" />
+
+                                            <input type="number"
+                                                   v-model="item.replacementLines[lineIndex].threshold"
+                                                   class="form-control"
+                                                   placeholder="Enter threshold" />
+                                            <button type="button"
+                                                    class="btn btn-danger btn-sm ms-2"
+                                                    @click="removeReplacementLine(item, lineIndex)">
+                                                Remove
+                                            </button>
+                                        </div>
+                                        <button type="button"
+                                                class="btn btn-primary btn-sm mt-2"
+                                                @click="addReplacementLine(item)">
+                                            Add Line
+                                        </button>
+                                    </div>
+                                </div>
+
+
+                                <!--Available solutions END-->
+
                                 <button type="submit" class="btn btn-primary mt-4">Submit</button>
                             </form>
                         </div>
@@ -110,6 +170,14 @@ state3 => edit on existing one
         computed: {
         },
         methods: {
+            // Triggered when the checkbox state changes
+            updateAvailableSolutions() {
+                // Logic for updating available solutions
+            },
+            // Remove a specific replacement line
+            removeReplacementLine(item, index) {
+                item.replacementLines.splice(index, 1); // Remove the line at the given index
+            },
             setYears(startYear, endYear) {
                 this.model.year = `${startYear}-${endYear}`;
             },
@@ -123,10 +191,17 @@ state3 => edit on existing one
                 // Logic for updating solutions based on checkable items
             },
             addReplacementLine(item) {
-                item.replacementLines.push({ searchString: "", replacementString: "", number: 0 });
-            },
-            removeReplacementLine(item, index) {
-                item.replacementLines.splice(index, 1);
+                if (!item.replacementLines) {
+                    item.replacementLines = [];
+                }
+                item.replacementLines.push({
+                    replacementId: item.replacementLines.length + 1, // Incremental ID
+                    searchString: "",
+                    replaceString: "",
+                    threshold: 0,
+                    action: 1,
+                    description: null
+                });
             },
             async addNew() {
                 // Construct the data according to the InputNewVariant model
@@ -226,6 +301,46 @@ state3 => edit on existing one
                 }
 
             },
+            async fetchTuningData(tuning_variant) {
+                //tuningspecial
+                this.formData.availableSolutions = []; // Clear previous solutions
+                this.formData.specialInfo = {}; // Reset specialInfo before fetching new data
+
+                try {
+                    // Fetch special tuning info based on tuning_id
+                    const apiUrl = import.meta.env.VITE_API_BASE_URL; // Get base URL from environment variables
+                    const response = await fetch(`${apiUrl}/api/Tuning/tuningspecialfull/${tuning_variant}`, {
+                        method: 'GET', // Specify the method
+                        credentials: 'include', // Include credentials such as cookies
+                    });
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`); // Handle HTTP errors
+                    }
+
+                    const data = await response.json(); // Parse the JSON response
+                    this.formData.specialInfo = data[0]; // Store the special tuning info in the component's data
+                    // Assuming specialInfo has available solutions, set them here
+                    this.formData.availableSolutions = this.formData.specialInfo.availableSolutions || []; // Set available solutions
+                    this.formData.selectedEcu.id = this.formData.specialInfo.ecuInfoId;
+
+
+                    // set checkboxes
+                    this.formData.availableSolutions.forEach(solution => {
+                        const checkableItem = this.formData.checkableItems.find(item => item.id === solution.name);
+                        if (checkableItem) {
+                            checkableItem.checked = true;
+                            checkableItem.value1 = solution.value1;
+                            checkableItem.value2 = solution.value2;
+                            checkableItem.replacementLines = solution.replacementsCommands || [];
+                        }
+                    });
+
+
+                } catch (error) {
+                    console.error('Error fetching tuning special data:', error); // Log the error for debugging
+                    // Handle any additional error state management here
+                }
+            }
         },
         mounted() {
             if (this.state === 1 || this.state === 2) {
@@ -247,7 +362,6 @@ state3 => edit on existing one
                     //this.formData.typeName= this.model.typeName;
                 }
             } else if (this.state === 3 && this.model) {
-                console.log(this.model);
                 this.formData = {
                     ...this.formData, // Preserve checkableItems structure
                     typeName: this.model.typeName || "",
@@ -260,10 +374,7 @@ state3 => edit on existing one
                     specialInfo: "",
                     availableSolutions: [],
                 };
-
-
-                //get selected ecu from backend
-                //get replacementscripts and solutions from backend
+                this.fetchTuningData(this.model.tuningId) // fetch all selected replacement strings and co...
             }
 
             this.formData.carBrand = this.carbrand.id;
