@@ -62,7 +62,7 @@ namespace BaseBackend.Controllers
         {
             _fileHandler = fileHandler;
             // Set the path where you want to save uploaded files
-            _targetFilePath = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles");
+            _targetFilePath = _fileHandler.getDownloadPathBase();
 
             // Ensure the directory exists
             if (!Directory.Exists(_targetFilePath))
@@ -70,7 +70,7 @@ namespace BaseBackend.Controllers
                 Directory.CreateDirectory(_targetFilePath);
             }
 
-            _taskHandler = taskHandler; 
+            _taskHandler = taskHandler;
         }
 
 
@@ -109,7 +109,7 @@ namespace BaseBackend.Controllers
 
         // POST api/fileupload
         [HttpPost("upload")]
-        public async Task<IActionResult> UploadFile(IFormFile file, [FromForm] string[] solutions, [FromForm] string solutionid, [FromForm] string[] dtcList,[FromForm] string additionalInfo)
+        public async Task<IActionResult> UploadFile(IFormFile file, [FromForm] string[] solutions, [FromForm] string solutionid, [FromForm] string[] dtcList, [FromForm] string additionalInfo)
         {
 
             var username = User.Identity.Name; // This gets the username
@@ -136,10 +136,10 @@ namespace BaseBackend.Controllers
             var fileName = $"{fileNameWithoutExtension}_{timestamp}{fileExtension}";
 
             // Create the full file path (including the username as a subfolder under UploadedFiles)
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles", username, fileName);
+            var filePath = Path.Combine(_fileHandler.getDownloadPathBaseWithUserName(username), fileName);
 
             // Ensure the directory for the user exists (create it if necessary)
-            Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles", username)); using (var stream = new FileStream(filePath, FileMode.Create))
+            Directory.CreateDirectory(_fileHandler.getDownloadPathBaseWithUserName(username)); using (var stream = new FileStream(filePath, FileMode.Create))
             {
                 await file.CopyToAsync(stream);
             }
@@ -157,7 +157,7 @@ namespace BaseBackend.Controllers
                 SelectedVariants = string.Join(", ", solutions),
                 CarmodelId = result,
                 TuningVariantId = solutionid,
-                additionalInfo= additionalInfo,
+                additionalInfo = additionalInfo,
                 State = 0,
                 ModifyDate = DateTime.UtcNow,
                 Title = "test"
@@ -198,7 +198,7 @@ namespace BaseBackend.Controllers
             }
 
             // Create the full file path (including the username as a subfolder under UploadedFiles)
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles", username, filename);
+            var filePath = Path.Combine(_fileHandler.getDownloadPathBaseWithUserName(username), filename);
 
             return filePath;
 

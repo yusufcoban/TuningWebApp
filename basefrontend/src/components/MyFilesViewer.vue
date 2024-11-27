@@ -19,10 +19,10 @@
                     <h3>Tasks:</h3>
                     <ul>
                         <li v-for="task in file.tasks" :key="task.id">
-                            <p><strong>Created On:</strong> {{ formatDate(task.CreateDate) }}</p>
+                            <p><strong>Created On:</strong> {{ formatDate(task.createDate) }}</p>
                             <p>
-                                <strong>New File Name:</strong>
-                                <button type="button" @click="downloadFile(task.NewFileName)">Download {{ task.NewFileName }}</button>
+                                <strong>New File Name: {{ task.newFileName }}</strong>
+                                <button type="button" @click="downloadFile(task.newFileName)">Download tuning file</button>
                             </p>
                         </li>
                     </ul>

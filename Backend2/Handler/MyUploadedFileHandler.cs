@@ -16,6 +16,16 @@ public class MyUploadedFileHandler
         _configuration = configuration;
     }
 
+    public string getDownloadPathBase()
+    {
+        return _configuration["FileSettings:UploadedFilesPath"];
+    }
+
+    public string getDownloadPathBaseWithUserName(string username)
+    {
+        return Path.Combine(_configuration["FileSettings:UploadedFilesPath"], username);
+    }
+
 
     // CREATE: Add a new uploaded file record to the database
     public async Task<int> AddUploadedFileAsync(MyUploadedFile uploadedFile)
@@ -257,9 +267,12 @@ Title=@Title
             {
                 try
                 {
+                    string directory = Path.GetDirectoryName(newFileName);
+                    string fileName = Path.GetFileName(newFileName);
+
                     // Update the Task with the new filename
                     const string updateTaskQuery = "UPDATE Task SET NewFileName = @NewFileName WHERE TaskId = @TaskId";
-                    var taskUpdated = await connection.ExecuteAsync(updateTaskQuery, new { NewFileName = newFileName, TaskId = taskId }, transaction);
+                    var taskUpdated = await connection.ExecuteAsync(updateTaskQuery, new { NewFileName = fileName, TaskId = taskId }, transaction);
 
                     // Update the related MyUploadedFile with the new state
                     const string updateFileQuery = @"
