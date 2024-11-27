@@ -150,12 +150,13 @@
 
         <div>
             <!-- Modal Component -->
-            <AddEditTuningVariantModal v-if="isModalOpen" 
+            <AddEditTuningVariantModal v-if="isModalOpen"
                                        :state="modalState"
                                        :typename="selectedTypeName"
                                        :carbrand="selectedMake"
                                        :model="selectedModelModal"
                                        :ecuList="ecuList"
+                                       :preselectedtuningid="fetchCurrentSelection"
                                        @closemodal="closeModal"
                                        @submit="handleSubmit" />
         </div>
@@ -168,7 +169,7 @@
     import AvailableSolutions from './AvailableSolutions.vue';
     import { mapState } from 'vuex'; // Import mapState for accessing Vuex state
     import { VueFinalModal } from 'vue-final-modal'
-    import AddEditTuningVariantModal from "./AddEditTuningVariantModal.vue"; // Import the modal component    
+    import AddEditTuningVariantModal from "./AddEditTuningVariantModal.vue"; // Import the modal component
 
 
     export default {
@@ -194,7 +195,7 @@
                 isOpenFromOutside: false,
                 isOpenFromOutsideModel: false,
                 isUploading: false,
-                isModalOpen:false,
+                isModalOpen: false,
                 ecuList: [
                     { Id: 1, EcuName: "MED17.7", ConnectionInfoId: 12 },
                     { Id: 2, EcuName: "MED17.8", ConnectionInfoId: 13 },
@@ -213,6 +214,9 @@
             this.getEcuListBackend();
         },
         computed: {
+            fetchCurrentSelection: function () {
+                return this.preselectedModelId;
+            },
             ...mapState(['user']),
             isAdmin() {
                 return this.user && this.user.role === 'Admin'; // Adjust this as per your logic for admins
@@ -486,7 +490,7 @@
             },
         },
         watch: {
-          
+
         }
     };
 </script>
