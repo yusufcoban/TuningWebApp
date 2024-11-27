@@ -38,4 +38,6 @@ public class MyUploadedFile
     [Required]
     [StringLength(100)]
     public string CarmodelId { get; set; }
+
+    public IEnumerable<Task> tasks { get; set; }
 }

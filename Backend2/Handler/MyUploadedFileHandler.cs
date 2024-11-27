@@ -1,6 +1,7 @@
 ﻿using Dapper;
 
 using System.Data.SqlClient;
+using System.Linq;
 
 public class MyUploadedFileHandler
 {
@@ -159,7 +160,17 @@ Title=@Title
         using (var connection = new SqlConnection(_configuration.GetConnectionString("dbo")))
         {
             connection.Open();
-            var uploadedFiles = connection.Query<MyUploadedFile>(query, new { username });
+            IEnumerable<MyUploadedFile> uploadedFiles = connection.Query<MyUploadedFile>(query, new { username });
+            if (uploadedFiles != null)
+            {
+                foreach (var item in uploadedFiles)
+                {
+                    //find all tasks to get modified files
+                    const string queryTasks = "SELECT * FROM [Task] where MyUploadedFileId=@taskId";
+                    item.tasks = connection.Query<Task>(queryTasks, new { taskId = item.Id });
+                }
+              
+            }
             return uploadedFiles;
         }
     }
