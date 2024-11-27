@@ -15,6 +15,18 @@
                 <p><strong>Selected Variants:</strong> {{ file.selectedVariants }}</p>
                 <p><strong>Car Model ID:</strong> {{ file.carmodelId }}</p>
                 <p><strong>Tuning Variant ID:</strong> {{ file.tuningVariantId }}</p>
+                <div v-if="file.tasks && file.tasks.length">
+                    <h3>Tasks:</h3>
+                    <ul>
+                        <li v-for="task in file.tasks" :key="task.id">
+                            <p><strong>Created On:</strong> {{ formatDate(task.CreateDate) }}</p>
+                            <p>
+                                <strong>New File Name:</strong>
+                                <button type="button" @click="downloadFile(task.NewFileName)">Download {{ task.NewFileName }}</button>
+                            </p>
+                        </li>
+                    </ul>
+                </div>
             </div>
 
             <!-- Display a message if no files are found -->
