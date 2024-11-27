@@ -1,4 +1,6 @@
-﻿using Dapper;
+﻿using BaseBackend.Models;
+
+using Dapper;
 
 using System.Data.SqlClient;
 using System.Linq;
@@ -56,6 +58,13 @@ public class MyUploadedFileHandler
         {
             connection.Open();
             var uploadedFile = await connection.QuerySingleOrDefaultAsync<MyUploadedFile>(query, new { Id = id });
+            if (uploadedFile != null)
+            {
+                //find all tasks to get modified files
+                const string queryTasks = "SELECT * FROM [Task] where MyUploadedFileId=@taskId";
+                uploadedFile.tasks = await connection.QueryAsync<BaseBackend.Models.Task>(queryTasks, new { taskId = uploadedFile.Id });
+
+            }
             return uploadedFile;
         }
     }
@@ -167,9 +176,9 @@ Title=@Title
                 {
                     //find all tasks to get modified files
                     const string queryTasks = "SELECT * FROM [Task] where MyUploadedFileId=@taskId";
-                    item.tasks = connection.Query<Task>(queryTasks, new { taskId = item.Id });
+                    item.tasks = connection.Query<BaseBackend.Models.Task>(queryTasks, new { taskId = item.Id });
                 }
-              
+
             }
             return uploadedFiles;
         }

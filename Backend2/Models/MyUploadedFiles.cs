@@ -1,3 +1,5 @@
+using BaseBackend.Models;
+
 using System;
 using System.ComponentModel.DataAnnotations;
 
@@ -39,5 +41,5 @@ public class MyUploadedFile
     [StringLength(100)]
     public string CarmodelId { get; set; }
 
-    public IEnumerable<Task> tasks { get; set; }
+    public IEnumerable<BaseBackend.Models.Task> tasks { get; set; }
 }
