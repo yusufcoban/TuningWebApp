@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization; // Add this namespace
+﻿using BaseBackend.Models;
+
+using Microsoft.AspNetCore.Authorization; // Add this namespace
 using Microsoft.AspNetCore.Mvc;
 
 namespace BaseBackend.Controllers
@@ -182,6 +184,34 @@ namespace BaseBackend.Controllers
             });
 
             return Ok(new { Message = "File and solutions uploaded successfully." });
+        }
+
+
+        [HttpPost("UploadTuningFile")]
+        public async Task<IActionResult> UploadTuningFile(IFormFile file, [FromForm] int filesolutionId, [FromForm] string additionalInfo)
+        {
+
+            var username = User.Identity.Name; // This gets the username
+            UserInformation currentUser = new UserInformation(username);
+
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("No file uploaded.");
+            }
+
+            // Create the full file path (including the username as a subfolder under UploadedFiles)
+            var filePath = Path.Combine(_fileHandler.getDownloadPathBaseWithUserName(username), file.FileName);
+
+            // Ensure the directory for the user exists (create it if necessary)
+            Directory.CreateDirectory(_fileHandler.getDownloadPathBaseWithUserName(username)); using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            _taskHandler.UpdateFileName(filesolutionId, file.FileName);
+            _taskHandler.UpdateStateMyUploadedFile(filesolutionId, 5, additionalInfo);
+
+            return Ok(new { Message = "Solutions uploaded successfully." });
         }
 
         private string fetchCurrentPathName(string filename, string userName = "")

@@ -28,7 +28,8 @@
                         </button>
                     </td>
                     <td>
-                        <button>
+                        <button @click="openUploadModal(file)">
+
                             Upload tuning file
                         </button>
                     </td>
@@ -37,23 +38,43 @@
         </table>
         <p v-if="openTasks.length === 0">No files uploaded yet.</p>
         <p v-if="errorMessage">{{ errorMessage }}</p>
+        <UploadTuningFileModal v-if="openModalUpload" :fileUploadTask="fileUploadTask" @closemodal="closeUploadModal" />
+
     </div>
 </template>
 
 <script>
+    import UploadTuningFileModal from './UploadTuningFileModal.vue';
+
     export default {
         data() {
             return {
                 openTasks: [], // Array to hold uploaded files
                 errorMessage: '', // To store error messages if any
+                openModalUpload: false,
+                fileUploadTask: {}
             };
         },
-        coponent() {
+        components: {
+            UploadTuningFileModal
         },
         mounted() {
             this.fetchopenTasks(); // Fetch uploaded files on component mount
         },
         methods: {
+            openUploadModal: function (taskModel) {
+                this.fileUploadTask = {},
+                this.openModalUpload = false;
+                this.fileUploadTask = taskModel;
+                this.$nextTick(() => {
+                    this.openModalUpload = true;
+                });
+            },
+            closeUploadModal: function () {
+                this.$nextTick(() => {
+                    this.openModalUpload = false;
+                });
+            },
             async downloadFile(fileName, userName) {
                 try {
                     const apiUrl = import.meta.env.VITE_API_BASE_URL;

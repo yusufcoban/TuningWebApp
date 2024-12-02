@@ -33,16 +33,17 @@
             <div v-else>
                 <p>No files found for this ID.</p>
             </div>
+            <!-- Static information card -->
+            <div class="static-info-card">
+                <h2>Static Information</h2>
+                <p><strong>Username:</strong> FakeUser123</p>
+                <p><strong>Email:</strong> fakeuser@example.com</p>
+                <p><strong>Subscription:</strong> Premium Member</p>
+                <p><strong>Membership Since:</strong> Jan 2020</p>
+            </div>
         </div>
 
-        <!-- Static information card -->
-        <div class="static-info-card">
-            <h2>Static Information</h2>
-            <p><strong>Username:</strong> FakeUser123</p>
-            <p><strong>Email:</strong> fakeuser@example.com</p>
-            <p><strong>Subscription:</strong> Premium Member</p>
-            <p><strong>Membership Since:</strong> Jan 2020</p>
-        </div>
+       
     </div>
 </template>
 
@@ -143,7 +144,6 @@
         border: 1px solid #ddd;
         border-radius: 8px;
         padding: 20px;
-        width: 300px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 

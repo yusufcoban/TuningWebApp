@@ -209,7 +209,8 @@
             AvailableSolutions,
             VueFinalModal,
             AddEditTuningVariantModal
-        }, mounted() {
+        },
+        mounted() {
             this.fetchCarBrands(); // Call fetch method on mount
             this.getEcuListBackend();
         },
