@@ -49,6 +49,27 @@
                                         <input type="number" id="enginePowerKw" v-model="formData.enginePowerKw" class="form-control" required />
                                     </div>
                                 </div>
+
+                                <div class="row mb-8">
+                                    <div class="col-xs-4 form-group">
+                                        <label for="fuelVariant">Fuel Variant</label>
+                                        <select id="fuelVariant" v-model="formData.fuelVariant" class="form-control" required>
+                                            <option value="petrol">Petrol</option>
+                                            <option value="diesel">Diesel</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-xs-4 form-group">
+                                        <label for="ecuSelect">Select ECU</label>
+                                        <select id="ecuSelect" v-model="formData.selectedEcu.id" class="form-control" required>
+                                            <option value="" disabled>Select ECU</option>
+                                            <option v-for="ecu in ecuList" :key="ecu.id" :value="ecu.id">
+                                                {{ ecu.ecuName }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+
+
                                 <!--Available solutions-->
 
                                 <div v-for="(item, index) in formData.checkableItems" :key="index" class="form-check mb-4">
