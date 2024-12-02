@@ -61,7 +61,7 @@ namespace TuningWebApp.Controllers
                 {
                     foreach (var item in carBrands)
                     {
-                        item.Variants = con.Query<TuningVariant>("SELECT * FROM TuningVariant Where TuningId LIKE '" + id + "%" + "' and isDeleted  = 0").ToList();
+                        item.Variants = con.Query<TuningVariant>("SELECT * FROM TuningVariant Where TuningId LIKE '" + id + "%" + "' ").ToList();
                     }
 
                 }
@@ -79,7 +79,7 @@ namespace TuningWebApp.Controllers
                 con.Open();
 
                 // SQL query to fetch tuning special info by Tuning ID
-                var query = "SELECT * FROM TuningSpecialInfo WHERE Id = @Id and isdeleted=0";
+                var query = "SELECT * FROM TuningSpecialInfo WHERE Id = @Id ";
 
                 // Fetching data and mapping to List<TuningSpecialInfo>
                 var tuningSpecialInfos = con.Query<TuningSpecialInfo>(query, new { Id = id }).ToList();
@@ -126,22 +126,19 @@ namespace TuningWebApp.Controllers
 
                 // Mark the TuningVariant record as deleted
                 string deleteTuningVariantQuery = @"
-            UPDATE [TuningVariant]
-            SET [isDeleted] = 1
+            DELETE FROM  [TuningVariant]
             WHERE [TuningId] = @TuningId";
                 con.Execute(deleteTuningVariantQuery, new { TuningId = tuningVariantId });
 
                 // Mark associated TuningSpecialInfo records as deleted
                 string deleteTuningSpecialInfoQuery = @"
-            UPDATE [TuningSpecialInfo]
-            SET [isDeleted] = 1
+            DELETE FROM  [TuningSpecialInfo]
             WHERE [Id] = @TuningId";
                 con.Execute(deleteTuningSpecialInfoQuery, new { TuningId = tuningVariantId });
 
                 // Mark related AvailableSolution records as deleted
                 string deleteAvailableSolutionQuery = @"
-            UPDATE [AvailableSolution]
-            SET [isDeleted] = 1
+            DELETE FROM  [AvailableSolution]
             WHERE [TuningSpecialInfoId] = @TuningId";
                 con.Execute(deleteAvailableSolutionQuery, new { TuningId = tuningVariantId });
 
