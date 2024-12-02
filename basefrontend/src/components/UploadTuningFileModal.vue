@@ -79,7 +79,10 @@
                 }
                 const formData = new FormData();
                 formData.append("file", this.selectedFile); // Append file to FormData
+                formData.append("filesolutionId", this.fileUploadTask.myUploadedFileId); // Append file to FormData
+                formData.append("additionalInfo", "base added only"); // Append file to FormData
 
+                
                 try {
                     // Get the API URL from environment variables
                     const apiUrl = import.meta.env.VITE_API_BASE_URL;
