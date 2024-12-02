@@ -257,6 +257,8 @@ Title=@Title
         }
     }
 
+    
+
     // 3. UPDATE: Upload file and set NewFileName, and update the State of MyUploadedFiles
     public async Task<bool> CompleteTaskAsync(int taskId, string newFileName, int newState)
     {
