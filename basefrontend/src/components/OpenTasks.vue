@@ -7,17 +7,31 @@
                     <th>taskId ID</th>
                     <th>createDate</th>
                     <th>tuningVariantId</th>
+                    <th>dtcList</th>
+                    <th>selectedVariants</th>
+                    <th>additionalInfo</th>
+                    <th>Download</th>
+                    <th>Upload</th>
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="file in openTasks" :key="file.id" class="row-clickable"   >
+                <tr v-for="file in openTasks" :key="file.id" class="row-clickable">
                     <td>{{ file.taskId }}</td>
                     <td>{{ formatDate(file.createDate) }}</td>
                     <td>{{ file.myUploadedFile.tuningVariantId }}</td>
+                    <td> {{file.myUploadedFile.dtcList}}</td>
+                    <td> {{file.myUploadedFile.selectedVariants}}</td>
+                    <td> {{file.myUploadedFile.additionalInfo}}</td>
                     <td>
-                    <button @click="downloadFile(file.myUploadedFile.fileName,file.myUploadedFile.username)">Download uploaded file
-                    </button></td>
-
+                        <button @click="downloadFile(file.myUploadedFile.fileName,file.myUploadedFile.username)">
+                            Download uploaded file
+                        </button>
+                    </td>
+                    <td>
+                        <button>
+                            Upload tuning file
+                        </button>
+                    </td>
                 </tr>
             </tbody>
         </table>
