@@ -193,19 +193,17 @@ namespace BaseBackend.Controllers
         public async Task<IActionResult> UploadTuningFile(IFormFile file, [FromForm] int filesolutionId, [FromForm] string additionalInfo)
         {
 
-            var username = User.Identity.Name; // This gets the username
-            UserInformation currentUser = new UserInformation(username);
-
             if (file == null || file.Length == 0)
             {
                 return BadRequest("No file uploaded.");
             }
 
+            MyUploadedFile originMyUploadFile = await _fileHandler.GetUploadedFileByIdAsync(filesolutionId);
             // Create the full file path (including the username as a subfolder under UploadedFiles)
-            var filePath = Path.Combine(_fileHandler.getDownloadPathBaseWithUserName(username), file.FileName);
+            var filePath = Path.Combine(_fileHandler.getDownloadPathBaseWithUserName(originMyUploadFile.Username), file.FileName);
 
             // Ensure the directory for the user exists (create it if necessary)
-            Directory.CreateDirectory(_fileHandler.getDownloadPathBaseWithUserName(username)); using (var stream = new FileStream(filePath, FileMode.Create))
+            Directory.CreateDirectory(_fileHandler.getDownloadPathBaseWithUserName(originMyUploadFile.Username)); using (var stream = new FileStream(filePath, FileMode.Create))
             {
                 await file.CopyToAsync(stream);
             }

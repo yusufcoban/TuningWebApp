@@ -101,6 +101,7 @@
                         })
                         .then(data => {
                             alert('Solutions uploaded successfully!');
+                            this.closeModal();
                         })
                         .catch(error => {
                             alert('There was an error uploading solutions. Please try again.');
@@ -120,14 +121,12 @@
 </script>
 
 <style scoped>
-    .modal-body
-    {
+    .modal-body {
         overflow-y: scroll;
         height: 1050px
     }
 
-    .modal-dialog
-    {
+    .modal-dialog {
         max-width: 100%;
         position: relative;
         width: auto;
@@ -135,16 +134,13 @@
         pointer-events: none;
     }
 
-    @media (min-width: 576px)
-    {
-        .modal-dialog
-        {
+    @media (min-width: 576px) {
+        .modal-dialog {
             margin: 1.75rem auto;
         }
     }
 
-    .modal
-    {
+    .modal {
         position: fixed;
         top: 0;
         left: 0;
@@ -156,91 +152,75 @@
         outline: 0;
     }
 
-    .auto-data
-    {
+    .auto-data {
         text-align: center;
         width: 100%;
     }
 
-    .tuning-info
-    {
+    .tuning-info {
         margin-top: 20px; /* Optional margin for overall tuning info */
     }
 
-    .tuning-row
-    {
+    .tuning-row {
         display: flex;
         flex-wrap: wrap; /* Allow cards to wrap into the next line */
         justify-content: space-between; /* Space out the cards evenly */
     }
 
-    .tuning-card
-    {
+    .tuning-card {
         flex: 0 1 calc(50% - 20px); /* Two cards per row with space between */
         margin-bottom: 20px; /* Space between rows */
     }
 
-    .card
-    {
+    .card {
         /* Add any additional styles for the card here */
     }
 
-    .underline-header
-    {
+    .underline-header {
         text-decoration: underline; /* Underline the typeName */
     }
 
-    .card
-    {
+    .card {
         margin: 20px auto;
         max-width: 100em;
     }
 
-    .items-grid
-    {
+    .items-grid {
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
     }
 
-    .item
-    {
+    .item {
         transition: transform 0.3s;
     }
 
-        .item:hover
-        {
+        .item:hover {
             transform: scale(1.05);
         }
 
-    .brand-icon, .model-icon
-    {
+    .brand-icon, .model-icon {
         width: 120px; /* Adjust size as needed */
         height: auto;
     }
 
-    .tuning-section
-    {
+    .tuning-section {
         margin-top: 20px;
     }
 
-        .tuning-section h6
-        {
+        .tuning-section h6 {
             margin-bottom: 10px;
         }
 
-    .petrol-diesel
-    {
+    .petrol-diesel {
         margin-top: 10px;
     }
 
-        .petrol-diesel h7
-        {
+        .petrol-diesel h7 {
             font-weight: bold;
         }
 
-    .upload-area
-    {
+    .upload-area {
         margin-top: 20px;
         text-align: center;
     }
