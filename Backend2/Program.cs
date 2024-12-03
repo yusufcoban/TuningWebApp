@@ -48,7 +48,8 @@ builder.Services.AddScoped<TuningDatabaseHandler>();
 builder.Services.AddScoped<MyUploadedFileHandler>();
 builder.Services.AddScoped<StringReplacementHandler>();
 builder.Services.AddScoped<TaskHandler>();
-builder.Services.AddScoped<EcuHandler>();
+builder.Services.AddScoped<UserHandler>();
+builder.Services.AddScoped<EcuHandler>(); 
 
 // Configure Authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

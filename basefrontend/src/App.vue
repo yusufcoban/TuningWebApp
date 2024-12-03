@@ -38,6 +38,13 @@
                         Open Tasks
                     </router-link>
                 </li>
+
+                <li class="sidebar-item" v-if="isAdmin">
+                    <router-link to="/userList" class="sidebar-link">
+                        <i class="bi bi-cash"></i>
+                        Users
+                    </router-link>
+                </li>
             </ul>
         </div>
 

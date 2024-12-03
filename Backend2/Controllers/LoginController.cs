@@ -10,15 +10,20 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
+using TuningWebApp.Controllers;
+
 [ApiController]
 [Route("api")]
 public class AuthController : ControllerBase
 {
     private readonly IConfiguration _configuration;
+    private readonly UserHandler _userHandler;
 
-    public AuthController(IConfiguration configuration)
+
+    public AuthController(IConfiguration configuration, UserHandler userHandler)
     {
         _configuration = configuration;
+        _userHandler = userHandler;
     }
 
     // Login Action
@@ -29,7 +34,7 @@ public class AuthController : ControllerBase
         try
         {
             // Validate user credentials against the database
-            var user = ValidateUserCredentials(request.Username, request.Password);
+            var user = _userHandler.ValidateUserCredentials(request.Username, request.Password);
             if (user != null)
             {
                 // Create claims for the logged-in user
@@ -47,15 +52,16 @@ public class AuthController : ControllerBase
 
                 return Ok(new { message = "Login successful", role = user.Role });
             }
-            return Unauthorized(new { message = "Invalid username or password"+"\r\n"+_configuration.GetConnectionString("dbo") });
+            return Unauthorized(new { message = "Invalid username or password" + "\r\n" + _configuration.GetConnectionString("dbo") });
 
         }
         catch (Exception ex)
         {
             //DEBUG
-            
-            return BadRequest(ex.Message + "\r\n"+_configuration.GetConnectionString("dbo"));
-        } }
+
+            return BadRequest(ex.Message + "\r\n" + _configuration.GetConnectionString("dbo"));
+        }
+    }
 
     // Logout Action
     [HttpPost("logout")]
@@ -85,7 +91,7 @@ public class AuthController : ControllerBase
             foreach (var (username, password) in users)
             {
                 // Hash the password
-                string hashedPassword = HashPassword(password);
+                string hashedPassword = _userHandler.HashPassword(password);
 
                 // Insert the user into the database
                 string sql = "INSERT INTO Users (Username, PasswordHash, Role) VALUES (@Username, @PasswordHash, @Role)";
@@ -94,53 +100,6 @@ public class AuthController : ControllerBase
         }
     }
 
-    
-    // Method to validate user credentials
-    private User ValidateUserCredentials(string username, string password)
-    {
-        using (var connection = new SqlConnection(_configuration.GetConnectionString("dbo")))
-        {
-            connection.Open();
-
-            // Fetch the hashed password and role for the user from the database
-            string sql = "SELECT Username, PasswordHash, Role FROM Users WHERE Username = @Username";
-            var user = connection.QuerySingleOrDefault<User>(sql, new { Username = username });
-
-            if (user != null)
-            {
-                // Check if the provided password matches the stored hashed password
-                if (VerifyPassword(password, user.PasswordHash))
-                {
-                    return user;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    // Method to hash the password using SHA-256
-    private string HashPassword(string password)
-    {
-        using (SHA256 sha256Hash = SHA256.Create())
-        {
-            byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(password));
-
-            StringBuilder builder = new StringBuilder();
-            for (int i = 0; i < bytes.Length; i++)
-            {
-                builder.Append(bytes[i].ToString("x2")); // Convert to hexadecimal
-            }
-            return builder.ToString();
-        }
-    }
-
-    // Method to verify if a password matches the stored hash
-    private bool VerifyPassword(string inputPassword, string storedHash)
-    {
-        string inputHash = HashPassword(inputPassword);
-        return inputHash.Equals(storedHash);
-    }
 }
 
 // LoginRequest class representing the login request payload

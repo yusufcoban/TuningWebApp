@@ -8,6 +8,9 @@ import MyFiles from '@/components/MyFiles.vue'; // Main layout
 import OpenTasks from '@/components/OpenTasks.vue'; // Admin task overview
 import MyFilesViewer from '@/components/MyFilesViewer.vue';
 import AutoDatabase from '@/components/AutoDatabase.vue'; // Dashboard component
+import UserList from '@/components/UserList.vue'; // Dashboard component
+
+
 // Define your routes
 const routes = [
     {
@@ -43,6 +46,11 @@ const routes = [
         path: '/MyFilesViewer/:id',
         meta: { requiresAuth: true }, // Ensure this route requires authentication,
         component: MyFilesViewer
+    },
+    {
+        path: '/userList',
+        meta: { requiresAuth: true }, // Ensure this route requires authentication,
+        component: UserList
     },
     
 ];
