@@ -93,6 +93,7 @@ namespace BaseBackend.Controllers
         }
 
         [HttpGet("downloadAdmin/{fileName}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DownloadFileAdmin(string fileName, [FromQuery] string userName)
         {
 
@@ -188,6 +189,7 @@ namespace BaseBackend.Controllers
 
 
         [HttpPost("UploadTuningFile")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UploadTuningFile(IFormFile file, [FromForm] int filesolutionId, [FromForm] string additionalInfo)
         {
 

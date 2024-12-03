@@ -57,12 +57,14 @@ namespace TuningWebApp.Controllers
         }
 
         [HttpPost("GenerateTuningVariant")]
+        [Authorize(Roles = "Admin")]
         public ActionResult<TuningSpecialInfo> GenerateTuningVariant(InputNewVariant inputNewVariant)
         {
             return Ok(_tuningDatabaseHandler.GenerateTuningVariant(inputNewVariant));
         }
 
         [HttpPost("UpdateTuningVariant")]
+        [Authorize(Roles = "Admin")]
         public ActionResult<TuningSpecialInfo> UpdateTuningVariant(InputNewVariant inputNewVariant)
         {
             _tuningDatabaseHandler.UpdateTuningVariant(inputNewVariant);
@@ -71,6 +73,7 @@ namespace TuningWebApp.Controllers
 
         //Todo check for admin
         [HttpPost("DeleteTuningVariant")]
+        [Authorize(Roles = "Admin")]
         public ActionResult<TuningSpecialInfo> DeleteTuningVariant(StringInput stringInput)
         {
             _tuningDatabaseHandler.DeleteTuningVariant(stringInput.Input);
