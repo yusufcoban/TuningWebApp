@@ -23,6 +23,7 @@ namespace TuningWebApp.Controllers
 
         // 1st API: Get list of all car brands
         [HttpGet("GetAllUser")]
+        [Authorize(Roles = "Admin")]
         public ActionResult<List<CarBrand>> GetAllUser()
         {
             return Ok(_userHandler.GetUsers());
