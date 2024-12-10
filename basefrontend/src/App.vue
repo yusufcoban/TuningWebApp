@@ -197,6 +197,7 @@
     {
         flex-grow: 1;
         background-color: #f4f6f9;
+        overflow: scroll;
         transition: width 0.3s ease;
     }
 
