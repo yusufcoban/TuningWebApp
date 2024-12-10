@@ -140,7 +140,7 @@
                 formData.append('solutionid', this.specialInfos?.tuningId + '');
 
                 // Append additional information text
-                formData.append('additionalInfo', this.additionalInfoUpload || '');
+                formData.append('additionalInfo', this.additionalInfoUpload || ' ');
 
                 // Assuming this.dtcList is a string like 'code1,code2;code3,code4'
                 // Assuming this.dtcList is a string that may be empty
