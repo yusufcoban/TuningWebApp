@@ -1,47 +1,48 @@
 <template>
     <div class="uploaded-files">
         <h1>Uploaded Files</h1>
-        <table class="table table-hover table-bordered">
-            <thead class="table-light">
-                <tr>
-                    <th>taskId ID</th>
-                    <th>createDate</th>
-                    <th>tuningVariantId</th>
-                    <th>dtcList</th>
-                    <th>selectedVariants</th>
-                    <th>additionalInfo</th>
-                    <th>Download</th>
-                    <th>Upload</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="file in openTasks" :key="file.id" class="row-clickable">
-                    <td>{{ file.taskId }}</td>
-                    <td>{{ formatDate(file.createDate) }}</td>
-                    <td>{{ file.myUploadedFile.tuningVariantId }}</td>
-                    <td> {{file.myUploadedFile.dtcList}}</td>
-                    <td> {{file.myUploadedFile.selectedVariants}}</td>
-                    <td> {{file.myUploadedFile.additionalInfo}}</td>
-                    <td>
-                        <button @click="downloadFile(file.myUploadedFile.fileName,file.myUploadedFile.username)">
-                            Download uploaded file
-                        </button>
-                    </td>
-                    <td>
-                        <button @click="openUploadModal(file)">
-
-                            Upload tuning file
-                        </button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="table-container">
+            <table class="table table-hover table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>taskId ID</th>
+                        <th>createDate</th>
+                        <th>tuningVariantId</th>
+                        <th>dtcList</th>
+                        <th>selectedVariants</th>
+                        <th>additionalInfo</th>
+                        <th>Download</th>
+                        <th>Upload</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="file in openTasks" :key="file.id" class="row-clickable">
+                        <td>{{ file.taskId }}</td>
+                        <td>{{ formatDate(file.createDate) }}</td>
+                        <td>{{ file.myUploadedFile.tuningVariantId }}</td>
+                        <td>{{ file.myUploadedFile.dtcList }}</td>
+                        <td>{{ file.myUploadedFile.selectedVariants }}</td>
+                        <td>{{ file.myUploadedFile.additionalInfo }}</td>
+                        <td>
+                            <button @click="downloadFile(file.myUploadedFile.fileName, file.myUploadedFile.username)">
+                                Download uploaded file
+                            </button>
+                        </td>
+                        <td>
+                            <button @click="openUploadModal(file)">
+                                Upload tuning file
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
         <p v-if="openTasks.length === 0">No files uploaded yet.</p>
         <p v-if="errorMessage">{{ errorMessage }}</p>
         <UploadTuningFileModal v-if="openModalUpload" :fileUploadTask="fileUploadTask" @closemodal="closeUploadModal" />
-
     </div>
 </template>
+
 
 <script>
     import UploadTuningFileModal from './UploadTuningFileModal.vue';
@@ -64,7 +65,7 @@
         methods: {
             openUploadModal: function (taskModel) {
                 this.fileUploadTask = {},
-                this.openModalUpload = false;
+                    this.openModalUpload = false;
                 this.fileUploadTask = taskModel;
                 this.$nextTick(() => {
                     this.openModalUpload = true;
@@ -141,7 +142,7 @@
     .uploaded-files
     {
         padding: 20px;
-        max-width: 800px;
+        max-width: 100em;
         margin: auto;
         font-family: Arial, sans-serif;
     }
@@ -152,9 +153,16 @@
         text-align: center;
     }
 
+    .table-container
+    {
+        overflow-x: auto; /* Enable horizontal scrolling */
+        max-width: 100%; /* Restrict width to parent container */
+        margin: 0 auto; /* Center the container */
+    }
+
     table
     {
-        width: 100%;
+        width: 100%; /* Make table take up the full width of the container */
         border-collapse: collapse;
         margin-top: 20px;
     }
@@ -171,9 +179,20 @@
         background-color: #f2f2f2;
     }
 
+    .row-clickable
+    {
+        cursor: pointer;
+    }
+
+        .row-clickable:hover
+        {
+            background-color: #f9f9f9; /* Highlight row on hover */
+        }
+
     p
     {
         text-align: center;
         color: #999;
     }
 </style>
+

@@ -1,43 +1,43 @@
 <template>
     <div class="uploaded-files">
         <h1>Uploaded Files</h1>
-        <table class="table table-hover table-bordered">
-            <thead class="table-light">
-                <tr>
-                    <th>UserID</th>
-                    <th>Username</th>
-                    <th>Email</th>
-                    <th>Full Name</th>
-                    <th>Address</th>
-                    <th>City</th>
-                    <th>Role</th>
-                    <th>Country</th>
-                    <th>State</th>
-                    <th>Phone Number</th>
-                    <th>Is Active</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="user in userList"
-                    :key="user.UserID"
-                    class="row-clickable"
-                    @click="this.$router.push({ path: `/UserDetails/` + user.UserID });">
-                    <td>{{ user.userID }}</td>
-                    <td>{{ user.username }}</td>
-                    <td>{{ user.email }}</td>
-                    <td>{{ user.fullName }}</td>
-                    <td>{{ user.address }}</td>
-                    <td>{{ user.city }}</td>
-                    <td>{{ user.role }}</td>
-                    <td>{{ user.country }}</td>
-                    <td>{{ user.state }}</td>
-                    <td>{{ user.phoneNumber }}</td>
-                    <td>{{ user.IsActive ? 'Yes' : 'No' }}</td>
-                </tr>
-            </tbody>
-
-        </table>
-
+        <div class="table-container">
+            <table class="table table-hover table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>UserID</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Full Name</th>
+                        <th>Address</th>
+                        <th>City</th>
+                        <th>Role</th>
+                        <th>Country</th>
+                        <th>State</th>
+                        <th>Phone Number</th>
+                        <th>Is Active</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="user in userList"
+                        :key="user.UserID"
+                        class="row-clickable"
+                        @click="this.$router.push({ path: `/UserDetails/` + user.UserID });">
+                        <td>{{ user.userID }}</td>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.fullName }}</td>
+                        <td>{{ user.address }}</td>
+                        <td>{{ user.city }}</td>
+                        <td>{{ user.role }}</td>
+                        <td>{{ user.country }}</td>
+                        <td>{{ user.state }}</td>
+                        <td>{{ user.phoneNumber }}</td>
+                        <td>{{ user.IsActive ? 'Yes' : 'No' }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
         <p v-if="userList.length === 0">No user found....</p>
     </div>
 </template>
@@ -83,7 +83,7 @@
     .uploaded-files
     {
         padding: 20px;
-        max-width: 800px;
+        max-width: 100em;
         margin: auto;
         font-family: Arial, sans-serif;
     }
@@ -94,9 +94,16 @@
         text-align: center;
     }
 
+    .table-container
+    {
+        overflow-x: auto; /* Enable horizontal scrolling */
+        max-width: 100%; /* Restrict width to parent container */
+        margin: 0 auto; /* Center the container */
+    }
+
     table
     {
-        width: 100%;
+        width: 100%; /* Make table take up the full width of the container */
         border-collapse: collapse;
         margin-top: 20px;
     }
@@ -113,9 +120,20 @@
         background-color: #f2f2f2;
     }
 
+    .row-clickable
+    {
+        cursor: pointer;
+    }
+
+        .row-clickable:hover
+        {
+            background-color: #f9f9f9; /* Highlight row on hover */
+        }
+
     p
     {
         text-align: center;
         color: #999;
     }
 </style>
+

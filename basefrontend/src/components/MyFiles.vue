@@ -1,35 +1,38 @@
 <template>
     <div class="uploaded-files">
         <h1>Uploaded Files</h1>
-        <table class="table table-hover table-bordered">
-            <thead class="table-light">
-                <tr>
-                    <th>Request ID</th>
-                    <th>Car Model ID</th>
-                    <th>Upload Date</th>
-                    <th>Last Modified Date</th>
-                    <th>State</th>
-                    <th>Title</th>
-                    <th>Infos</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="file in uploadedFiles" :key="file.id" class="row-clickable" @click="this.$router.push({ path: `/MyFilesViewer/`+file.id });">
-                    <td>{{ file.id }}</td>
-                    <td>{{ file.carmodelId }}</td>
-                    <td>{{ formatDate(file.uploadDate) }}</td>
-                    <td>{{ formatDate(file.modifyDate) }}</td>
-                    <td>{{ file.state }}</td>
-                    <td>{{ file.fileName }} </td>
-                    <td>{{ file.additionalInfo }}</td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="table-container">
+            <table class="table table-hover table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>Request ID</th>
+                        <th>Car Model ID</th>
+                        <th>Upload Date</th>
+                        <th>Last Modified Date</th>
+                        <th>State</th>
+                        <th>Title</th>
+                        <th>Infos</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="file in uploadedFiles" :key="file.id" class="row-clickable" @click="this.$router.push({ path: `/MyFilesViewer/`+file.id });">
+                        <td>{{ file.id }}</td>
+                        <td>{{ file.carmodelId }}</td>
+                        <td>{{ formatDate(file.uploadDate) }}</td>
+                        <td>{{ formatDate(file.modifyDate) }}</td>
+                        <td>{{ file.state }}</td>
+                        <td>{{ file.fileName }}</td>
+                        <td>{{ file.additionalInfo }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
         <p v-if="uploadedFiles.length === 0">No files uploaded yet.</p>
         <p v-if="errorMessage">{{ errorMessage }}</p>
     </div>
-</template>
 
+
+</template>
 <script>
     export default {
         data() {
@@ -104,37 +107,62 @@
     };
 </script>
 
+
 <style scoped>
-    .uploaded-files {
+    .uploaded-files
+    {
         padding: 20px;
-        max-width: 800px;
+        max-width: 100em;
         margin: auto;
         font-family: Arial, sans-serif;
     }
 
-    h1 {
+    h1
+    {
         color: #2c3e50;
         text-align: center;
     }
 
-    table {
-        width: 100%;
+    .table-container
+    {
+        overflow-x: auto; /* Enable horizontal scrolling */
+        max-width: 100%; /* Restrict width to parent container */
+        margin: 0 auto; /* Center the container */
+    }
+
+    table
+    {
+        width: 100%; /* Make table take up the full width of the container */
         border-collapse: collapse;
         margin-top: 20px;
     }
 
-    th, td {
+    th, td
+    {
         border: 1px solid #ddd;
         padding: 8px;
         text-align: left;
     }
 
-    th {
+    th
+    {
         background-color: #f2f2f2;
     }
 
-    p {
+    .row-clickable
+    {
+        cursor: pointer;
+    }
+
+        .row-clickable:hover
+        {
+            background-color: #f9f9f9; /* Highlight row on hover */
+        }
+
+    p
+    {
         text-align: center;
         color: #999;
     }
 </style>
+
