@@ -1,7 +1,7 @@
 <template>
     <div id="app" class="d-flex">
         <!-- Sidebar -->
-        <div :class="['sidebar', { 'sidebar-collapsed': !isSidebarOpen }]" v-if="isAuthenticated">
+        <div class="sidebar" v-if="isAuthenticated">
             <div class="sidebar-header d-flex justify-content-between align-items-center">
                 <a href="/" class="logo-link">
                     <font-awesome-icon :icon="['fas', 'house']" class="logo-icon" />
@@ -45,9 +45,9 @@
         </div>
 
         <!-- Main Content -->
-        <div :class="['main-content', { 'full-width': !isSidebarOpen }]">
+        <div class="main-content">
             <header class="header-bar colorLogo text-white d-flex align-items-center p-3 shadow">
-                <button @click="toggleSidebar" class="hamburger-icon">
+                <button v-if="1==2" class="hamburger-icon">
                     <span class="material-icons">menu</span>
                 </button>
                 <h1 class="m-0">SgTuners</h1>
@@ -58,7 +58,6 @@
         </div>
     </div>
 </template>
-
 <script>
     import { mapState } from 'vuex';
 
@@ -78,9 +77,6 @@
             }
         },
         methods: {
-            toggleSidebar() {
-                this.isSidebarOpen = !this.isSidebarOpen; // Toggle sidebar visibility
-            },
             handleLogout() {
                 // Handle user logout
                 this.$store.commit('logout'); // Clear user data in Vuex
