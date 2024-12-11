@@ -195,6 +195,7 @@
         display: flex;
         width: 100%;
         height: 100vh; /* Full height to show fixed sidebar */
+        overflow: auto;
     }
 
     .sidebar
@@ -203,14 +204,12 @@
         padding: 15px;
         background-color: #f8f9fa; /* Background color for the sidebar */
         border-right: 1px solid #dee2e6; /* Right border for separation */
-        overflow-y: auto; /* Allow scrolling if content overflows */
+        overflow: auto;
     }
 
     .main-content
     {
-        flex: 1; /* Takes the remaining space */
-        padding: 15px;
-        overflow-y: auto; /* Allow scrolling if content overflows */
+        
     }
 
     .solution-card
