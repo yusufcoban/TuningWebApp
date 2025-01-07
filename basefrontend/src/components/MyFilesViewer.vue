@@ -9,7 +9,7 @@
             <!-- Loop through each uploaded file and display it in a card -->
             <div v-if="dataFromBackend && dataFromBackend.length" v-for="file in dataFromBackend" :key="file.id" class="file-card">
                 <h2>{{ file.title }}</h2>
-                <p><strong>File Name:</strong> {{ file.fileName }} <button type="button" @click="downloadFile(file.fileName)">Download</button></p>
+                <p><strong>File Name:</strong> {{ file.fileName }} <button  type="button" class="btn btn-primary" @click="downloadFile(file.fileName)">Download</button></p>
                 <p><strong>Uploaded on:</strong> {{ formatDate(file.uploadDate) }}</p>
                 <p><strong>DTC List:</strong> {{ file.dtcList }}</p>
                 <p><strong>Selected Variants:</strong> {{ file.selectedVariants }}</p>
@@ -22,7 +22,8 @@
                             <p><strong>Created On:</strong> {{ formatDate(task.createDate) }}</p>
                             <p>
                                 <strong>New File Name: {{ task.newFileName }}</strong>
-                                <button type="button" @click="downloadFile(task.newFileName)">Download tuning file</button>
+                                <button type="button" class="btn btn-primary" @click="downloadFile(task.newFileName)">Download tuning file</button>
+                                
                             </p>
                         </li>
                     </ul>

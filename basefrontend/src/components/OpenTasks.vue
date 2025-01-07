@@ -24,14 +24,12 @@
                         <td>{{ file.myUploadedFile.selectedVariants }}</td>
                         <td>{{ file.myUploadedFile.additionalInfo }}</td>
                         <td>
-                            <button @click="downloadFile(file.myUploadedFile.fileName, file.myUploadedFile.username)">
+                            <button @click="downloadFile(file.myUploadedFile.fileName, file.myUploadedFile.username)" type="button" class="btn btn-primary">
                                 Download uploaded file
                             </button>
                         </td>
                         <td>
-                            <button @click="openUploadModal(file)">
-                                Upload tuning file
-                            </button>
+                            <button @click="openUploadModal(file)" type="button" class="btn btn-info"> Upload tuning file</button>
                         </td>
                     </tr>
                 </tbody>

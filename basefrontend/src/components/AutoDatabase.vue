@@ -8,7 +8,7 @@
                         <span class="svg-icon svg-icon-1 position-absolute ms-6">
                             <i class="bi bi-search fs-3 vcentered"></i>
                         </span>
-                        <input type="text" v-model="searchTerm" class="form-control form-control-solid w-100 ps-15 py-5 fs-4" placeholder="Search by make">
+                        <input v-if="1==2" type="text" v-model="searchTerm" class="form-control form-control-solid w-100 ps-15 py-5 fs-4" placeholder="Search by make">
                     </div>
                 </div>
             </div>
@@ -77,35 +77,60 @@
                             <h7 class="text-gray-800">Petrol Models</h7>
                             <ul class="list-unstyled">
                                 <li v-for="(petrol, index) in group.petrol" :key="index" class="text-gray-900 fs-6">
-                                    <a href="#" @click.prevent="showDetails(petrol)">{{ petrol.engine }} - {{ petrol.year }} - {{ petrol.horsepower }} {{ petrol.ecuType }}</a>
-                                    <span v-if="isAdmin" @click="openDeleteDialog(petrol.tuningId)" class="plus-icon" title="Add New Model" data-bs-toggle="modal" data-bs-target="#addModelModal">
-                                        <button class="btn btn-primary btn-sm">
-                                            <font-awesome-icon icon="trash-can" />  Delete
-                                        </button>
-                                    </span>
-                                    <span v-if="isAdmin" @click="openModal(3,typeName,petrol)" class="plus-icon" title="Add New Model" data-bs-toggle="modal" data-bs-target="#addModelModal">
-                                        <button class="btn btn-primary btn-sm">
-                                            <font-awesome-icon icon="trash-can" />  Edit
-                                        </button>
-                                    </span>
+
+                                    <div class="page-content">
+                                        <div class="row">
+                                            <div class="col-md-10">
+                                                <div class="blue">
+                                                    <a href="#" @click.prevent="showDetails(petrol)">{{ petrol.engine }} - {{ petrol.year }} - {{ petrol.horsepower }} {{ petrol.ecuType }}</a>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <span v-if="isAdmin" @click="openDeleteDialog(petrol.tuningId)" class="plus-icon" title="Add New Model" data-bs-toggle="modal" data-bs-target="#addModelModal">
+                                                    <button class="btn btn-danger btn-sm">
+                                                        <font-awesome-icon icon="trash-can" />  Delete
+                                                    </button>
+                                                </span>
+                                                <span v-if="isAdmin" @click="openModal(3,typeName,petrol)" class="plus-icon" title="Add New Model" data-bs-toggle="modal" data-bs-target="#addModelModal">
+                                                    <button class="btn btn-secondary btn-sm">
+                                                        <font-awesome-icon icon="trash-can" />  Edit
+                                                    </button>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </li>
                             </ul>
                             <h7 class="text-gray-800">Diesel Models</h7>
                             <ul class="list-unstyled">
                                 <li v-for="(diesel, index) in group.diesel" :key="index" class="text-gray-900 fs-6">
-                                    <a href="#" @click.prevent="showDetails(diesel)">{{ diesel.engine }} - {{ diesel.year }} - {{ diesel.horsepower }} {{ diesel.ecuType }}</a>
-                                    <span v-if="isAdmin" @click="openDeleteDialog(diesel.tuningId)" class="plus-icon" title="Add New Model" data-bs-toggle="modal" data-bs-target="#addModelModal">
-                                        <button class="btn btn-primary btn-sm">
-                                            <font-awesome-icon icon="trash-can" />  Delete
-                                        </button>
 
-                                    </span>
+                                    <div class="page-content">
+                                        <div class="row">
+                                            <div class="col-md-10">
+                                                <div class="blue">
+                                                    <a href="#" @click.prevent="showDetails(diesel)">{{ diesel.engine }} - {{ diesel.year }} - {{ diesel.horsepower }} {{ diesel.ecuType }}</a> 
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <span v-if="isAdmin" @click="openDeleteDialog(diesel.tuningId)" class="plus-icon" title="Add New Model" data-bs-toggle="modal" data-bs-target="#addModelModal">
+                                                    <button class="btn btn-danger btn-sm">
+                                                        <font-awesome-icon icon="trash-can" />  Delete
+                                                    </button>
 
-                                    <span v-if="isAdmin" @click="openModal(3,typeName,diesel)" class="plus-icon" title="Add New Model" data-bs-toggle="modal" data-bs-target="#addModelModal">
-                                        <button class="btn btn-primary btn-sm">
-                                            <font-awesome-icon icon="trash-can" />  Edit
-                                        </button>
-                                    </span>
+                                                </span>
+
+                                                <span v-if="isAdmin" @click="openModal(3,typeName,diesel)" class="plus-icon" title="Add New Model" data-bs-toggle="modal" data-bs-target="#addModelModal">
+                                                    <button class="btn btn-secondary btn-sm">
+                                                        <font-awesome-icon icon="trash-can" />  Edit
+                                                    </button>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                  
                                 </li>
                             </ul>
                         </div>
